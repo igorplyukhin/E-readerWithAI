@@ -1,5 +1,5 @@
 import LLaMA
-
+import BookReader
 class Answer_User:
     def __init__(self,data, count_answer, block_text):
         self.data = data
@@ -41,6 +41,7 @@ class Answer_User:
         else:
             if self.block_text > 2000:
                 self.block_text -= 200
-            print("Ответ неправильный =(")
+            print("Ответ неправильный =(\n")
+            print(f"Правильный ответ - {right_answer}")
         return True
 
