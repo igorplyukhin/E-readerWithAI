@@ -1,12 +1,28 @@
-import LLaMA
-import BookReader
-class Answer_User:
-    def __init__(self,data, count_answer, block_text):
-        self.data = data
-        self.count_answer = count_answer
-        self.block_text = block_text
+import LLaMA  # Импорт модуля LLaMA для работы с внешним API
+import proccesing_answer_LLM as a_llm  # Импорт модуля proccesing_answer_LLM для обработки ответов
+class User_Answer:
+    def __init__(self, data, count_answer, block_text):
+        """
+        Конструктор класса Answer_User.
+
+        Параметры:
+        - data: данные для обработки (предположительно текст или запрос)
+        - count_answer: количество вариантов ответов (integer)
+        - block_text: блокировка текста (integer), возможно, связанная с каким-то условием
+        """
+        self.right_answer = []
+        self.data = data  # Инициализация данных для обработки
+        self.count_answer = count_answer  # Инициализация количества вариантов ответов
+        self.block_text = block_text  # Инициализация блокировки текста
+
     def answerUser(self):
-        answer_user = input("Ваш ответ: ")
+        """
+        Метод для получения ответа пользователя.
+
+        Возвращает:
+        - Ответ пользователя в виде строки (str)
+        """
+        answer_user = input("Ваш ответ: ")  # Получение ответа пользователя через консольный ввод
         while not answer_user.isdigit() or int(answer_user) > 4 or int(answer_user) < 1:
             if answer_user.isdigit() == 1:
                 print(f"Выберете варианты ответа 1 - {self.count_answer}!")
@@ -14,34 +30,64 @@ class Answer_User:
                 print("Введите число!")
             answer_user = input("Ваш ответ: ")
         return answer_user
+
     def search_right_answer(self, result):
+        """
+        Метод для поиска правильного ответа.
+
+        Параметры:
+        - result: результат обработки или запроса (предположительно строка или список)
+
+        Возвращает:
+        - Правильный ответ в виде строки (str), либо 0, если не удалось найти правильный ответ
+        """
         i = -1
-        while result[i].isdigit() == 0 or (int(result[i]) not in range(1, self.count_answer+1)):
+        while result[i].isdigit() == 0 or (int(result[i]) not in range(1, self.count_answer + 1)):
             if i < -50:
                 return 0
             i -= 1
+        if a_llm.right_answer(result[i], result):
+            return 0
         return result[i]
-    def process_answer(self, result):
-        right_answer = self.search_right_answer(result)
+
+    def process_answer(self, result, number_question):
+        """
+        Метод для обработки ответа пользователя и проверки его правильности.
+
+        Параметры:,
+        - result: результат обработки или запроса (предположительно строка или список)
+
+        Возвращает:
+        - True, если ответ правильный, False в противном случае
+        """
+        right_answer = self.search_right_answer(result)  # Поиск правильного ответа
+        self.right_answer.append(right_answer)
         count_call = 0
         while right_answer == 0:
-            result = LLaMA.llama(self.data, "questions", 0)
-            right_answer = self.search_right_answer(result)
+            if number_question == 0:
+                result = LLaMA.llama(self.data, "questions", 0, 0, 0)  # Выполнение запроса к внешнему API
+            else:
+                result = LLaMA.llama(self.data, "questions_add", 0, 0, 0)  # Выполнение запроса к внешнему API
+            right_answer = self.search_right_answer(result)  # Повторный поиск правильного ответа
             count_call += 1
             if count_call == 3:
                 break
         if right_answer == 0:
-            print("Error")
             return False
-        answer_user = self.answerUser()
+        #Обрезаем правильный ответ для пользователя
+        i = -1
+        size = len(result)
+        while abs(i) < size and result[i] != '\n':
+            i -= 1
+        print(result[0:i - 1])  # Вывод обработанного результата
+        answer_user = self.answerUser()  # Получение ответа пользователя
         if answer_user == right_answer:
-            if self.block_text < 3000:
-                self.block_text += 100
+            if self.block_text < self.block_text:
+                self.block_text += 100  # Изменение части текста который считываем
             print("Ответ правильный =)")
         else:
-            if self.block_text > 2000:
-                self.block_text -= 200
+            if self.block_text > self.block_text * 0.6:
+                self.block_text -= 200  # Изменение части текста который считываем
             print("Ответ неправильный =(\n")
-            print(f"Правильный ответ - {right_answer}")
+            print(f"Правильный ответ - {right_answer}")  # Вывод правильного ответа в случае ошибки пользователя
         return True
-

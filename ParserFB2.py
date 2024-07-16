@@ -1,125 +1,145 @@
-import xml.etree.ElementTree as ET
+# from lxml import etree
+# import chardet
+# import Divide
+# # Определение кодировки файла
+#
+#
+# # Чтение fb2 файла и парсинг с помощью lxml
+# def parse_fb2(file_path):
+#     encoding = Divide.detect_encoding(file_path)
+#     with open(file_path, 'r', encoding=encoding) as f:
+#         content = f.read()
+#     root = etree.fromstring(content.encode(encoding))
+#     return root
+#
+#
+# def extract_author(tree):
+#     author_element = tree.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}author')
+#     if author_element is not None:
+#         first_name = author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}first-name').text if author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}first-name') is not None else ''
+#         middle_name = author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}middle-name').text if author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}middle-name') is not None else ''
+#         last_name = author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}last-name').text if author_element.find('{http://www.gribuser.ru/xml/fictionbook/2.0}last-name') is not None else ''
+#         full_name = f"{first_name} {middle_name} {last_name}".strip()
+#         return full_name
+#     return None
+#
+#
+# # Функция для извлечения текста книги
+# def extract_text(root):
+#     author = extract_author(root)
+#     title_info = root.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}title-info')
+#     book_title = title_info.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}book-title').text
+#     body = root.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}body')
+#     paragraphs = body.findall('.//{http://www.gribuser.ru/xml/fictionbook/2.0}p')
+#     text = ''
+#     for para in paragraphs:
+#         text += str(para.text) + '\n'
+#     return text, author, book_title
+#
+#
+# def process_fb2(name_file):
+#     tree = parse_fb2(name_file)
+#     book_text, author, book_title = extract_text(tree)
+#     text = "\n".join(p.text.strip() for p in book_text.body.p) if book.body.p else ""
+#
+#     print(author, book_title)
+#     new_name_file = "SummaryBook.txt"
+#     f = open("SummaryBook.txt", "w", encoding="utf-8")
+#     f.write(str(book_text))
+#     f.close()
+#     return book_title
+#
+
+
+
+# def convert_fb2_to_txt(input_file, output_file):
+#     parser = FB2Parser(input_file)
+#     book = parser.parse()
+#
+#     if book:
+#         # Получаем текст из элементов <p> (абзацев) книги
+#         text = "\n".join(p.text.strip() for p in book.body.p) if book.body.p else ""
+#
+#         # Записываем текст в файл
+#         with open(output_file, "w", encoding="utf-8") as f:
+#             f.write(text)
+#         print(f"Содержимое FB2 файла '{input_file}' успешно сконвертировано в '{output_file}'.")
+#     else:
+#         print(f"Ошибка при разборе FB2 файла '{input_file}'.")
+
+from lxml import etree
+import chardet
 import os
 
 
-class FB2Parser:
-    def __init__(self, filename, external_annotations=True):
-        self.root = ET.parse(filename).getroot()
-        self.cleanup()
-        self.external_annotations = external_annotations
+# Определение кодировки файла
+def detect_encoding(file_path):
+    with open(file_path, 'rb') as f:
+        raw_data = f.read()
+        result = chardet.detect(raw_data)
+        encoding = result['encoding']
+        return encoding
 
-    def cleanup(self):
-        for element in self.root.iter():
-                element.tag = element.tag.partition('}')[-1]
 
-    def is_flat(self):
-        return self.root.find('./body/section/section') is None
+# Чтение fb2 файла и парсинг с помощью lxml
+def parse_fb2(file_path):
+    encoding = detect_encoding(file_path)
+    with open(file_path, 'r', encoding=encoding) as f:
+        content = f.read()
+    root = etree.fromstring(content.encode(encoding))
+    return root
 
-    def extract(self):
-        self._book_title = self.root.find('./description/title-info/book-title').text
-        self._main, *rest, self._annotations = self.root.findall('body')
-        if self.is_flat():
-            self.write(self.split(self._main))
-        else:
-            for part_id, part in enumerate(self._main.findall('section')):
-                self.write(self.split(part, id=part_id))
-        self.write_description()
-        if self._annotations and self.external_annotations:
-            self.write_annotations()
 
-    def split(self, section, id=None):
-        part_title = section.find('./title/p').text
-        parts = {}
-        for chapter_id, chapter in enumerate(section.findall('section')):
-            chapter_title = chapter.find('./title/p').text
-            part_path = '%02d_%s' % (id, part_title) if id is not None else ''
-            chapter_path = os.path.join(part_path,
-                                        '%02d_%s.fb2' % (chapter_id, chapter_title))
-            path = os.path.join('.', self._book_title, chapter_path)
-            parts[path] = chapter
-        return parts
+def extract_author(tree):
+    author_element = tree.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}author')
+    if author_element is not None:
+        first_name = author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}first-name').text if author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}first-name') is not None else ''
+        middle_name = author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}middle-name').text if author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}middle-name') is not None else ''
+        last_name = author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}last-name').text if author_element.find(
+            '{http://www.gribuser.ru/xml/fictionbook/2.0}last-name') is not None else ''
+        full_name = f"{first_name} {middle_name} {last_name}".strip()
+        return full_name
+    return None
 
-    def write_description(self):
-        path = os.path.join('.', self._book_title, 'description.fb2')
-        fb = ET.Element('FictionBook', attrib={'xmlns': "http://www.gribuser.ru/xml/fictionbook/2.0"})
-        fb.append(self.root.find('description'))
-        images = self.root.find('binary')
-        if images:
-            fb.append(images)
-        book = ET.ElementTree(fb)
-        book.write(path, encoding='utf-8', xml_declaration=True)
 
-    def write_annotations(self):
-        path = os.path.join('.', self._book_title, 'annotations.fb2')
-        self.write({path: self._annotations})
+# Функция для извлечения текста книги
+def extract_text(root):
+    author = extract_author(root)
+    title_info = root.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}title-info')
+    book_title = title_info.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}book-title').text
+    body = root.find('.//{http://www.gribuser.ru/xml/fictionbook/2.0}body')
+    paragraphs = body.findall('.//{http://www.gribuser.ru/xml/fictionbook/2.0}p')
 
-    def write(self, data):
-        for path, chapter in data.items():
-            dir = os.path.dirname(path)
-            fb = ET.Element('FictionBook',
-                            attrib={'xmlns': "http://www.gribuser.ru/xml/fictionbook/2.0"})
-            body = ET.SubElement(fb, 'body')
-            body.append(chapter)
-            if self._annotations and not self.external_annotations:
-                body.append(self._annotations)
-            book = ET.ElementTree(fb)
-            os.makedirs(dir, exist_ok=True)
-            book.write(path, encoding='utf-8', xml_declaration=True)
+    text = ''
+    for para in paragraphs:
+        para_text = para.text
+        if para_text is not None:
+            text += para_text.strip() + '\n'
 
-if __name__ == '__main__':
-    FB2Parser('gmn.fb2').extract()
+    return text, author, book_title
 
-class BookReader:
-    def __init__(self, name_file, count_answer=4, step_read=1, block_text=300):
-        self.name_file = name_file
-        self.count_answer = count_answer
-        self.step_read = step_read
-        self.block_text = block_text
-        self.data = ''
-        self.count_symbols = 0
-        self.end_file = True
 
-    def read_and_process(self):
-        with open(self.name_file, 'r', encoding='utf-8') as f:
-            while self.end_file:
-                self.read_block(f)
-                if self.count_symbols == self.block_text:
-                    self.read_until_period(f)
-                self.prompt_user()
-                print(self.data)
-                self.data = ""
+# Функция для обработки fb2 файла
+def process_fb2(name_file):
+    # Парсинг файла fb2
+    tree = parse_fb2(name_file)
+    encoding = detect_encoding(name_file)
+    # Извлечение текста, автора и названия книги
+    book_text, author, book_title = extract_text(tree)
 
-    def read_block(self, f):
-        while self.count_symbols < self.block_text:
-            char = f.read(self.step_read)
-            if char == '':
-                self.end_file = False
-                break
-            self.data += char
-            if char != ' ':
-                self.count_symbols += self.step_read
+    # Запись текста книги в файл TXT
+    output_file = "fb2-txt.txt"
+    with open(output_file, 'w', encoding=encoding) as f:
+        f.write(book_text)
+    return output_file
 
-    def read_until_period(self, f):
-        while True:
-            char = f.read(self.step_read)
-            if char == '':
-                self.end_file = False
-                break
-            self.data += char
-            if char == '.':
-                self.count_symbols = 0
-                break
-
-    def prompt_user(self):
-        answer_user = input("Введите номер ответа (1-4): ")
-        while not answer_user.isdigit() or int(answer_user) > self.count_answer or int(answer_user) < 1:
-            if answer_user.isdigit() == 1:
-                print(f"Выберете варианты ответа 1 - {self.count_answer}!")
-            else:
-                print("Введите число!")
-            answer_user = input("Введите номер ответа (1-4): ")
-
-# Использование класса BookReader
-name_file = "book.txt"
-book_reader = BookReader(name_file)
-book_reader.read_and_process()
+#
+# fb2_file = "72963.fb2"
+# name_file = process_fb2(fb2_file)
+# print(open(name_file, "r", encoding="utf-8").read())
+#
