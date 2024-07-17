@@ -6,7 +6,7 @@ def prompts(context, mode, count_symbols,question, right_answer):
                                           f"Составь вопрос полностью на русском языке по фрагменту текста, который проверит понимание читателя фрагмента текста."
                                           f"Напиши этот вопрос и 4 варианта ответа на этот вопрос, где только 1 верный, укажи  только номер ответа который является верным.###"
                                           f"Напиши только эту информацию, ничего лишнего"},
-            {"role": "user", "content": f"Исходный текст: \n {context}"},
+            {f"role": "user", "content": f"Исходный текст: \n {context}"},
             {"role": "assistant", "content": f'"Вопрос?\n"'
                                              f"1.Ответ 1 "
                                              f"2.Ответ 2 "
@@ -29,46 +29,6 @@ def prompts(context, mode, count_symbols,question, right_answer):
 
         ]
     }
-#     prompt_questions = {
-#     "messages": [
-#         {
-#             "role": "system",
-#             "content": "Prompt: Verify the reader's comprehension of the text. "
-#                        "Compose a question in Russian based on a fragment of the text that will test the reader's understanding. "
-#                        "Write this question along with 4 answer options, where only 1 is correct. Indicate only the number of the correct answer."
-#         },
-#         {
-#             "role": "user",
-#             "content": "Source text: \n [Insert the original text here]"
-#         },
-#         {
-#             "role": "assistant",
-#             "content": "\"Question?\n\""
-#                        "1. Answer 1 "
-#                        "2. Answer 2 "
-#                        "3. Answer 3 "
-#                        "4. Answer 4 "
-#                        "\"number of the correct answer\""
-#         }
-#     ]
-# }
-#     prompt_translate = {
-#     "messages": [
-#         {
-#             "role": "system",
-#             "content": "Prompt: Переведи текст ниже на русский, учитывай все детали "
-#
-#         },
-#         {
-#             "role": "user",
-#             "content": "text: \n "
-#         },
-#         {
-#             "role": "assistant",
-#             "content": "'Text'"
-#         }
-#     ]
-# }
 
 
     prompt_right_answer = {

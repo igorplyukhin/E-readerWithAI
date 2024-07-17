@@ -30,7 +30,7 @@ def split_book_by_chapters(file_path):
     chapters = []
     current_chapter = []
 
-    chapter_patterns = ancient_numbers + modern_symbols + [r"Глава", r"Параграф", r"\d+\."]
+    chapter_patterns = ancient_numbers + modern_symbols + [r"Глава", r"Параграф"]
     chapter_regex = re.compile(r'|'.join(map(lambda x: fr"(^\s*{x}\s*)", chapter_patterns)))
 
     with open(file_path, 'r', encoding=encoding) as file:

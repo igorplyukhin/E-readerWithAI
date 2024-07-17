@@ -6,9 +6,8 @@ import time
 
 
 # Функция для суммаризации книги и записи результатов в файл
-def summarize(name_file, name_sum_file):
+def summarize(name_file, name_sum_file, need_questions, questions, answer, book_reader):
     print("Обрабатываем ваш текст =)...")
-    book_reader = BookReader.BookReader(name_file)
     encoding = book_reader.detect_encoding()
     chapters = Divide.split_book_by_chapters(name_file)
     SummaryBook = open(name_sum_file, "w", encoding=encoding)
@@ -18,11 +17,17 @@ def summarize(name_file, name_sum_file):
             number_chapter += 1
             continue
         number_chapter = book_reader.reading(chapters, number_chapter)
+        book_reader.block_original.append(book_reader.data)
         summary = LLaMA.llama(book_reader.data, "sum", 0, 0, 0)
         summary_edit = LLaMA.llama(summary, "edit", 0, 0, 0)
+        print(summary_edit + "\n")
+        input("")
+        if need_questions is True:
+            questions.create_questions(summary_edit, answer, book_reader)
         SummaryBook.write(summary_edit)
         SummaryBook.write("\n")
         book_reader.data = ""
+    questions.right_answer = answer.right_answer
     SummaryBook.close()
 
 
@@ -44,7 +49,7 @@ def count_sentences(text):
 
 
 # Асинхронная функция для обработки частей книги
-async def process_chunk(book_reader, arr_block, process_queue, chapters, block_original):
+async def process_chunk(book_reader, arr_block, process_queue, chapters):
     while True:
         await process_queue.get()
 
@@ -53,7 +58,7 @@ async def process_chunk(book_reader, arr_block, process_queue, chapters, block_o
                 await asyncio.sleep(1)  # Ожидание если достигнут лимит готовых блоков
             book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)
             length = count_sentences(book_reader.data)
-            block_original.append(book_reader.data)
+            book_reader.block_original.append(book_reader.data)
             summary = LLaMA.llama(book_reader.data, "sum at time", book_reader.symbols_koef * length, 0, 0)
             summary_edit = LLaMA.llama(summary, "edit", 0, 0, 0)
             arr_block.append(summary_edit)
@@ -65,23 +70,22 @@ async def process_chunk(book_reader, arr_block, process_queue, chapters, block_o
 
 
 # Главная асинхронная функция для управления процессом чтения и суммаризации
-async def main(name_file):
+async def main(name_file,  need_questions, questions, answer_user, book_reader):
     length_book = len_book(name_file)  # Получение длины книги
-
-    time_full = 10 * 2 * 60  # Полное время для чтения (в минутах)
+    days = int(input("Введите количество дней: "))
+    hours = float(input("Введите количество часов в день: "))
+    time_full = days * hours * 60  # Полное время для чтения (в минутах)
     chapters = Divide.split_book_by_chapters(name_file)  # Разделение книги на главы
-    book_reader = BookReader.BookReader(chapters)
-    block_original = []
     arr_block = []
     process_queue = asyncio.Queue()
-    task_chunk = asyncio.create_task(process_chunk(book_reader, arr_block, process_queue, chapters, block_original))
+    task_chunk = asyncio.create_task(process_chunk(book_reader, arr_block, process_queue, chapters))
 
     # Начальная обработка первых трех глав
     for _ in range(3):
         if book_reader.number_chapter < len(chapters):
             book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)
             arr_block.append(book_reader.data)
-            block_original.append(book_reader.data)
+            book_reader.block_original.append(book_reader.data)
             book_reader.count_ready_block += 1
         book_reader.data = ""
 
@@ -102,17 +106,22 @@ async def main(name_file):
             flag = 1
             start = time.time()
             print(f"Фрагмент {book_reader.count_block + 1}:\n{arr_block[book_reader.count_block]}")
+            if need_questions is True:
+                questions.create_questions(arr_block[book_reader.count_block], answer_user, book_reader)
             book_reader.count_ready_block -= 1
-            answer = input("Нажмите Enter, чтобы продолжить, original, edit для обработки фрагмента ещё раз...")
+            answer = input("Нажмите Enter, чтобы продолжить, original, exit, edit для обработки фрагмента ещё раз...")
             count_iter = 0
+            if answer == "exit":
+                print("Завершаем процесс =)...\n")
+                break
             if answer == "original":
-                print(block_original[book_reader.count_block])
+                print(book_reader.block_original[book_reader.count_block])
             while answer == "edit":
                 if count_iter == 4:
-                    print(block_original[book_reader.count_block])
+                    print(book_reader.block_original[book_reader.count_block])
                     break
                 print("Подождите...\n")
-                result = LLaMA.llama(block_original[book_reader.count_block], "sum at time", count_sentences(block_original[book_reader.count_block]) * book_reader.symbols_koef)
+                result = LLaMA.llama(book_reader.block_original[book_reader.count_block], "sum at time", count_sentences(book_reader.block_original[book_reader.count_block]) * book_reader.symbols_koef)
                 print(result)
                 answer = input("Нажмите Enter, чтобы продолжить или edit для обработки фрагмента ещё раз...")
             end = time.time()
@@ -140,14 +149,20 @@ async def main(name_file):
                 print("Подождите, фрагмент еще не обработан.")
             flag = 0
             await asyncio.sleep(1)
-
+    questions.right_answer = answer_user.right_answer
     print(f"Общее время чтения: {sum(reading_times): .2f} минут")
 
 
-def control(name_file):
+def control(name_file, questions, answer, book_reader):
     name_sum_file = "SummaryBook.txt"
+    need_questions = input("Нужны ли вопросы?: ")
+    if need_questions == "да":
+        need_questions = True
+    else:
+        need_questions = False
+
     mode = input("time/sum: ")
     if mode == "time":
-        asyncio.run(main(name_file))
+        asyncio.run(main(name_file, need_questions, questions, answer, book_reader))
     if mode == "sum":
-        summarize(name_file, name_sum_file)
+        summarize(name_file, name_sum_file,  need_questions, questions, answer, book_reader)

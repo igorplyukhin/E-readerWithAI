@@ -29,27 +29,18 @@ class Questions:
         return result
 
 
-    def create_questions(self):
-        chapters = Divide.split_book_by_chapters(self.file_name)  # разбиваем по главам
-        book_reader = BookReader.BookReader(self.file_name)
-        answer = Answer_user.User_Answer(book_reader.data, count_answer=4, block_text=3000)
-        while book_reader.number_chapter < len(chapters):
-            if len(chapters[book_reader.number_chapter]) < 200:  # на случай если разбиение произошло неверно
-                book_reader.number_chapter += 1
-                continue
-            book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)  # считываем фрагмент текста
-            if book_reader.number_chapter >= len(chapters):
+    def create_questions(self, text, answer, book_reader):
+        book_reader.data = text
+        answer.data = text
+        res_first = self.request_first(book_reader)  # Первый вопрос
+        self.request_second(book_reader, res_first)  # Второй вопрос
+        for number_questions in range(2):
+            result = self.answer_llm[
+                self.count_questions - 2 + number_questions]  # -2 так как массив и обращаемся ко второму вопросу
+            answer.data = book_reader.data
+            if not answer.process_answer(result, number_questions):
                 break
-            print(book_reader.data)
-            res_first = self.request_first(book_reader)  # Первый вопрос
-            self.request_second(book_reader, res_first)  # Второй вопрос
-            for number_questions in range(2):
-                result = self.answer_llm[self.count_questions - 2 + number_questions]  # -2 так как массив и обращаемся ко второму вопросу
-                answer.data = book_reader.data
-                if not answer.process_answer(result, number_questions):
-                    break
-            book_reader.data = ""
-        self.right_answer = answer.right_answer
+        book_reader.data = ""
 
     def questions_all_book(self):
         print("Тест по всей книге\n")
@@ -71,7 +62,7 @@ class Questions:
             else:
                 print("Ответ неверный =( \n")
                 print(f"Верный ответ - {self.right_answer[number_question]}")
-
+        print("Тест окончен\n")
 
 
 # file_name = "book.txt"
