@@ -2,9 +2,10 @@ import BookReader
 import Answer_user
 import LLaMA
 import Divide
+
 class Questions:
 
-#Запрос для второго вопроса
+    # Запрос для второго вопроса
     def __init__(self, file_name):
         self.file_name = file_name
         self.answer_llm = []
@@ -12,12 +13,12 @@ class Questions:
         self.right_answer = []
 
     def request_second(self, book_reader, last_res):
-        result = LLaMA.llama(book_reader.data + f"Прошлый вопрос и ответы на него: {last_res}", "questions_add", 0, 0, 0)
+        result = LLaMA.llama(book_reader.data + f"Previous question and answers: {last_res}", "questions_add", 0, 0, 0)
         result = LLaMA.llama(result, "questions_edit", 0, 0, 0)
         self.answer_llm.append(result)
         self.count_questions += 1
 
-    #Запрос для первого вопроса
+    # Запрос для первого вопроса
     def request_first(self, book_reader):
         result = LLaMA.llama(book_reader.data, "questions", 0, 0, 0)
         result = LLaMA.llama(result, "questions_edit", 0, 0, 0)
@@ -27,7 +28,6 @@ class Questions:
         self.answer_llm.append(result)
         self.count_questions += 1
         return result
-
 
     def create_questions(self, text, answer, book_reader):
         book_reader.data = text
@@ -43,12 +43,12 @@ class Questions:
         book_reader.data = ""
 
     def questions_all_book(self):
-        print("Тест по всей книге\n")
+        print("Test for the entire book\n")
         answer_user = Answer_user.User_Answer("", 0, "")
         for number_question in range(0, len(self.right_answer), 2):  # каждый второй вопрос
             if number_question >= len(self.answer_llm):
                 break
-            result = self.answer_llm[number_question] # вопрос
+            result = self.answer_llm[number_question]  # вопрос
             # обрезаем правильный ответ
             i = -1
             size = len(result)
@@ -58,12 +58,11 @@ class Questions:
             answer = answer_user.answerUser()
 
             if answer == self.right_answer[number_question]:
-                print("Правильный ответ =) \n")
+                print("Correct answer =) \n")
             else:
-                print("Ответ неверный =( \n")
-                print(f"Верный ответ - {self.right_answer[number_question]}")
-        print("Тест окончен\n")
-
+                print("Incorrect answer =( \n")
+                print(f"Correct answer - {self.right_answer[number_question]}")
+        print("Test finished\n")
 
 # file_name = "book.txt"
 # questions = Questions(file_name)

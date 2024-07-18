@@ -16,6 +16,7 @@ class BookReader:
         self.count_ready_block = 0
         self.symbols_koef = 1
         self.block_original = []
+        self.flag_break = False
 
     def detect_encoding(self):
         with open(self.name_file, 'rb') as file:

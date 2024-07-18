@@ -1,5 +1,6 @@
 import LLaMA  # Импорт модуля LLaMA для работы с внешним API
 import proccesing_answer_LLM as a_llm  # Импорт модуля proccesing_answer_LLM для обработки ответов
+
 class User_Answer:
     def __init__(self, data, count_answer, block_text):
         """
@@ -22,13 +23,13 @@ class User_Answer:
         Возвращает:
         - Ответ пользователя в виде строки (str)
         """
-        answer_user = input("Ваш ответ: ")  # Получение ответа пользователя через консольный ввод
+        answer_user = input("Your answer: ")  # Получение ответа пользователя через консольный ввод
         while not answer_user.isdigit() or int(answer_user) > 4 or int(answer_user) < 1:
             if answer_user.isdigit() == 1:
-                print(f"Выберете варианты ответа 1 - {self.count_answer}!")
+                print(f"Choose answer options 1 - {self.count_answer}!")
             else:
-                print("Введите число!")
-            answer_user = input("Ваш ответ: ")
+                print("Enter a number!")
+            answer_user = input("Your answer: ")
         return answer_user
 
     def search_right_answer(self, result):
@@ -54,7 +55,7 @@ class User_Answer:
         """
         Метод для обработки ответа пользователя и проверки его правильности.
 
-        Параметры:,
+        Параметры:
         - result: результат обработки или запроса (предположительно строка или список)
 
         Возвращает:
@@ -74,7 +75,7 @@ class User_Answer:
                 break
         if right_answer == 0:
             return False
-        #Обрезаем правильный ответ для пользователя
+        # Обрезаем правильный ответ для пользователя
         i = -1
         size = len(result)
         while abs(i) < size and result[i] != '\n':
@@ -84,10 +85,10 @@ class User_Answer:
         if answer_user == right_answer:
             if self.block_text < self.block_text:
                 self.block_text += 100  # Изменение части текста который считываем
-            print("Ответ правильный =)")
+            print("Correct answer =)")
         else:
             if self.block_text > self.block_text * 0.6:
                 self.block_text -= 200  # Изменение части текста который считываем
-            print("Ответ неправильный =(\n")
-            print(f"Правильный ответ - {right_answer}")  # Вывод правильного ответа в случае ошибки пользователя
+            print("Incorrect answer =(\n")
+            print(f"Correct answer - {right_answer}")  # Вывод правильного ответа в случае ошибки пользователя
         return True

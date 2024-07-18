@@ -7,18 +7,17 @@ import about_book
 import Answer_user
 import BookReader
 import Questions_original_text
+
 name_file = "72963.fb2"
 
-
 def help():
-    print(f'1. Читать сокращенную версию\n'
-          f'2. Читать с вопросами\n'
-          f'3. Читать пересказ книги\n'
-          f'4. О чем книга\n'
-          f'5. Пройти тест по книге\n'
-          f'6. Подобные книги\n'
-          f'7. Выйти')
-
+    print(f'1. Read the summarized version\n'
+          f'2. Read with questions\n'
+          f'3. Read the retelling of the book\n'
+          f'4. About the book\n'
+          f'5. Take a test on the book\n'
+          f'6. Similar books\n'
+          f'7. Exit')  # Enum
 
 def check_extension(name_file):
       file_name, file_exp = os.path.splitext(f"C:/Users/miros/PycharmProjects/BookAI/{name_file}")
@@ -26,7 +25,6 @@ def check_extension(name_file):
             file_name = ParserFB2.process_fb2(name_file)
             return file_name
       return None
-
 
 def main(name_file):
       name_file = check_extension(name_file)
@@ -37,12 +35,16 @@ def main(name_file):
       questions = Questions.Questions(name_file)
       answer_user = Answer_user.User_Answer("", count_answer=4, block_text=3000)
       while True:
+            book_reader.flag_break = False
             help()
-            answer = input("... ")
+            answer = input("comand: ")
+            while not answer.isdigit():
+                  print("Incorrect input\n")
+                  answer = input("comand: ")
             answer = int(answer)
-            if answer not in range(1, 7):
-                  while answer not in range(1, 7):
-                        answer = input("... ")
+            if answer not in range(1, 8):
+                  while answer not in range(1, 8):
+                        answer = input("comand: ")
                         answer = int(answer)
             if answer == 1:
                   Summarize.control(name_file, questions, answer_user, book_reader)
@@ -57,11 +59,12 @@ def main(name_file):
                   about_book.about_book(chapters)
             if answer == 5:
                   if len(questions.right_answer) == 0:
-                        print("Прочитай сначала\n")
+                        print("Read first\n")
                   else:
                         questions.questions_all_book()
             if answer == 6:
                   about_book.advice_book(chapters)
             if answer == 7:
                   break
+
 main(name_file)

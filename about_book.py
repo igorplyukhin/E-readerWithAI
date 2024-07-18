@@ -12,6 +12,7 @@ def about_book(chapters):
     if "Нет" in name_book or "нет" in name_book:
         print("Ничего не знаю об этой книге\n")
         return
+    print("Wait please...\n")
     result = LLaMA.llama(name_book, "about book", 0, 0, 0)
     result = LLaMA.llama(result, "edit", 0, 0, 0)
     print(result)
@@ -37,6 +38,7 @@ def retelling(name_file, chapters, questions, answer, book_reader):
     if "Нет" in name_book or "нет" in name_book:
         summary(name_file, questions, answer, book_reader)
     else:
+        print("Wait please...")
         result = LLaMA.llama(name_book, "retelling", 0, 0, 0)
         result = LLaMA.llama(result, "edit", 0, 0, 0)
         print(result)

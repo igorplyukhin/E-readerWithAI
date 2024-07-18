@@ -19,7 +19,9 @@ def question_orig(book_reader, questions, answer):
             if not answer.process_answer(result, number_questions):
                 break
         book_reader.data = ""
-        next_user = input("Дальше?: ")
-        if next_user == "Нет" or next_user == 'нет':
+        next_user = input("Next?(no/enter): ")
+        while next_user != "" and next_user != "no" and next_user != 'No':
+            next_user = input("Next?(no/enter): ")
+        if next_user == "no" or next_user == 'No':
             break
     questions.right_answer = answer.right_answer
