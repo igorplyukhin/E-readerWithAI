@@ -6,29 +6,29 @@ import time
 
 
 # Функция для суммаризации книги и записи результатов в файл
-def summarize(name_file, name_sum_file, need_questions, questions, answer, book_reader):
-    print("Processing your text =)...")
-    encoding = book_reader.detect_encoding()
-    chapters = Divide.split_book_by_chapters(name_file)
-    SummaryBook = open(name_sum_file, "w", encoding=encoding)
-    number_chapter = 0
-    while number_chapter < len(chapters):
-        if len(chapters[number_chapter]) < 200:
-            number_chapter += 1
-            continue
-        number_chapter = book_reader.reading(chapters, number_chapter)
-        book_reader.block_original.append(book_reader.data)
-        summary = LLaMA.llama(book_reader.data, "sum", 0, 0, 0)
-        summary_edit = LLaMA.llama(summary, "edit", 0, 0, 0)
-        print(summary_edit + "\n")
-        input("")
-        if need_questions is True:
-            questions.create_questions(summary_edit, answer, book_reader)
-        SummaryBook.write(summary_edit)
-        SummaryBook.write("\n")
-        book_reader.data = ""
-    questions.right_answer = answer.right_answer
-    SummaryBook.close()
+# def summarize(name_file, name_sum_file, need_questions, questions, answer, book_reader):
+#     print("Processing your text =)...")
+#     encoding = book_reader.detect_encoding()
+#     chapters = Divide.split_book_by_chapters(name_file)
+#     SummaryBook = open(name_sum_file, "w", encoding=encoding)
+#     number_chapter = 0
+#     while number_chapter < len(chapters):
+#         if len(chapters[number_chapter]) < 200:
+#             number_chapter += 1
+#             continue
+#         number_chapter = book_reader.reading(chapters, number_chapter)
+#         book_reader.block_original.append(book_reader.data) # bd
+#         summary = LLaMA.llama(book_reader.data, "sum", 0, 0, 0)
+#         summary_edit = LLaMA.llama(summary, "edit", 0, 0, 0)
+#         print(summary_edit + "\n")
+#         input("")
+#         if need_questions is True:
+#             questions.create_questions(summary_edit, answer, book_reader)
+#         SummaryBook.write(summary_edit)
+#         SummaryBook.write("\n")
+#         book_reader.data = ""
+#     questions.right_answer = answer.right_answer
+#     SummaryBook.close()
 
 
 # Функция для получения длины книги
@@ -59,13 +59,13 @@ async def process_chunk(book_reader, arr_block, process_queue, chapters, mode):
                 await asyncio.sleep(1)  # Ожидание если достигнут лимит готовых блоков
             book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)
             length = count_sentences(book_reader.data)
-            book_reader.block_original.append(book_reader.data)
+            book_reader.block_original.append(book_reader.data) # bd
             if mode == 'time':
                 summary = LLaMA.llama(book_reader.data, "sum at time", book_reader.symbols_koef * length, 0, 0)
             if mode == 'sum':
                 summary = LLaMA.llama(book_reader.data, "sum", 0, 0, 0)
             summary_edit = LLaMA.llama(summary, "edit", 0, 0, 0)
-            arr_block.append(summary_edit)
+            arr_block.append(summary_edit)  # bd
             book_reader.count_ready_block += 1
             book_reader.data = ""
             process_queue.task_done()
@@ -92,8 +92,8 @@ async def main(name_file, need_questions, questions, answer_user, book_reader, m
     for _ in range(count_iter):
         if book_reader.number_chapter < len(chapters):
             book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)
-            arr_block.append(book_reader.data)
-            book_reader.block_original.append(book_reader.data)
+            arr_block.append(book_reader.data)  #bd
+            book_reader.block_original.append(book_reader.data)  #bd
             book_reader.count_ready_block += 1
         book_reader.data = ""
 
@@ -115,7 +115,7 @@ async def main(name_file, need_questions, questions, answer_user, book_reader, m
             start = time.time()
             print(f"\n{arr_block[book_reader.count_block]}")
             if need_questions is True:
-                questions.create_questions(arr_block[book_reader.count_block], answer_user, book_reader)
+                questions.create_questions(arr_block[book_reader.count_block], answer_user, book_reader) #bd
             book_reader.count_ready_block -= 1
             answer = input("Press Enter to continue, type 'original', 'exit', 'edit' for further processing...")
             count_iter = 0
@@ -124,13 +124,13 @@ async def main(name_file, need_questions, questions, answer_user, book_reader, m
                 book_reader.flag_break = True
                 break
             if answer == "original":
-                print(book_reader.block_original[book_reader.count_block])
+                print(book_reader.block_original[book_reader.count_block]) #bd
             while answer == "edit":
                 if count_iter == 4:
-                    print(book_reader.block_original[book_reader.count_block])
+                    print(book_reader.block_original[book_reader.count_block]) #bd
                     break
                 print("Please wait...\n")
-                result = LLaMA.llama(book_reader.block_original[book_reader.count_block], "sum at time", count_sentences(book_reader.block_original[book_reader.count_block]) * book_reader.symbols_koef, 0, 0)
+                result = LLaMA.llama(book_reader.block_original[book_reader.count_block], "sum at time", count_sentences(book_reader.block_original[book_reader.count_block]) * book_reader.symbols_koef, 0, 0) # bd
                 print(result)
                 answer = input("Press Enter to continue or 'edit' for further processing...")
             end = time.time()
@@ -140,7 +140,7 @@ async def main(name_file, need_questions, questions, answer_user, book_reader, m
                 continue
             if reading_time > 30:
                 reading_time = 15
-            reading_times.append(reading_time)
+            reading_times.append(reading_time)  #bd
             if book_reader.count_block >= 3:
                 for i in range(1, 4):
                     length_blocks += len(arr_block[book_reader.count_block - i])

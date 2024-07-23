@@ -3,14 +3,15 @@ import Questions
 import os
 import ParserFB2
 import Divide
-import about_book
+import informs_book
 import Answer_user
 import BookReader
 import Questions_original_text
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from Scripts import Divide, BookReader, Questions, Answer_user
-
+import server
+from pymongo import MongoClient
 
 name_file = "book.txt"
 
@@ -24,7 +25,7 @@ def help():
           f'7. Exit')  # Enum
 
 def check_extension(name_file):
-      file_name, file_exp = os.path.splitext(f"C:/Users/miros/PycharmProjects/BookAI/Scripts/{name_file}")
+      file_name, file_exp = os.path.splitext(f"C:/Users/miros/PycharmProjects/BookAI/Scripts/{name_file}")  # Убрать
       if file_exp == ".fb2":
             file_name = ParserFB2.process_fb2(name_file)
             return file_name
@@ -32,7 +33,8 @@ def check_extension(name_file):
             return name_file
       return None
 
-def main(name_file):
+
+def init_objects(name_file):
       name_file = check_extension(name_file)
       if name_file is None:
             print("Other format book\n")
@@ -40,6 +42,24 @@ def main(name_file):
       book_reader = BookReader.BookReader(name_file)
       questions = Questions.Questions(name_file)
       answer_user = Answer_user.User_Answer("", count_answer=4, block_text=3000)
+
+      return book_reader, questions, answer_user, chapters
+
+
+def information(chapters, questions, answer_user, book_reader):
+      title, author = informs_book.title_book(chapters)
+      information_book = {
+            "about": informs_book.about_book(chapters, title + ' ' + author),
+            "retelling": informs_book.retelling(name_file, chapters, questions, answer_user, book_reader,
+                                                title + ' ' + author),
+            "advice": informs_book.advice_book(chapters, title + ' ' + author),
+            "title": title,
+            "author": author
+      }  # Оптимизация
+      return information_book
+
+
+def interface(book_reader, questions, answer_user, chapters,  database):
       while True:
             book_reader.flag_break = False
             help()
@@ -58,19 +78,41 @@ def main(name_file):
                   if book_reader.number_chapter >= len(chapters):
                         questions = Questions.Questions(name_file)
                         answer_user = Answer_user.User_Answer("", count_answer=4, block_text=3000)
-                  Questions_original_text.question_orig(book_reader, questions, answer_user)
+                  Questions_original_text.question_orig(book_reader, questions, answer_user, database)
             if answer == 3:
-                  about_book.retelling(name_file, chapters, questions, answer_user, book_reader)
+                  print(database.document_book['retelling'])
             if answer == 4:
-                  about_book.about_book(chapters)
+                  print(database.document_book['about'])
             if answer == 5:
                   if len(questions.right_answer) == 0:
                         print("Read first\n")
                   else:
-                        questions.questions_all_book()
+                        questions.questions_all_book(database)
             if answer == 6:
-                  about_book.advice_book(chapters)
+                  print(database.document_book['advice'])
             if answer == 7:
                   break
-main(name_file)
 
+
+def init_documents(login, chapters, questions, answer_user, book_reader):
+      document_user, collection_user = server.init_user(login)
+      # возвращаем id книг
+      # получаем id книги или создаем
+      id_book = document_user['count_book'] + 1
+      document_book, collection_book = server.init_book(id_book)
+      if document_book is None:
+            information_book = information(chapters, questions, answer_user, book_reader)
+            document_book = server.create_book(id_book, information_book, document_user['_id'])
+      collection_text = server.init_text()
+      database = server.Database(collection_user, collection_book, collection_text,
+                                 document_user['_id'], document_book['_id'])
+      return database
+
+def main(name_file):
+      login = "user777"
+      book_reader, questions, answer_user, chapters = init_objects(name_file)
+      database = init_documents(login, chapters, questions, answer_user, book_reader)
+      interface(book_reader, questions, answer_user, chapters, database)
+
+
+main(name_file)

@@ -152,6 +152,8 @@ def prompts(context, mode, count_symbols,question, right_answer):
                                         f"Пиши на русском языке"
                                         f"Напиши только эту информацию, ничего лишнего"},
             {"role": "user", "content": f"Исходный текст: \n {context}"},
+            {"role": "user", "content": f"Title:Название книги\n"
+                                        f"Author:Имя автора"}
         ]
     }
     prompt_advice = {

@@ -51,7 +51,7 @@ class User_Answer:
             return 0
         return result[i]
 
-    def process_answer(self, result, number_question):
+    def process_answer(self, result, number_question, database):
         """
         Метод для обработки ответа пользователя и проверки его правильности.
 
@@ -62,7 +62,6 @@ class User_Answer:
         - True, если ответ правильный, False в противном случае
         """
         right_answer = self.search_right_answer(result)  # Поиск правильного ответа
-        self.right_answer.append(right_answer)
         count_call = 0
         while right_answer == 0:
             if number_question == 0:
@@ -75,6 +74,8 @@ class User_Answer:
                 break
         if right_answer == 0:
             return False
+        self.right_answer.append(right_answer)  # bd
+        database.add_right_answer(right_answer)
         # Обрезаем правильный ответ для пользователя
         i = -1
         size = len(result)
