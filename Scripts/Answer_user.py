@@ -2,7 +2,7 @@ import LLaMA  # Импорт модуля LLaMA для работы с внеш�
 import proccesing_answer_LLM as a_llm  # Импорт модуля proccesing_answer_LLM для обработки ответов
 
 class User_Answer:
-    def __init__(self, data, count_answer, block_text):
+    def __init__(self, data, count_answer):
         """
         Конструктор класса Answer_User.
 
@@ -14,8 +14,6 @@ class User_Answer:
         self.right_answer = []
         self.data = data  # Инициализация данных для обработки
         self.count_answer = count_answer  # Инициализация количества вариантов ответов
-        self.block_text = block_text  # Инициализация блокировки текста
-
     def answerUser(self):
         """
         Метод для получения ответа пользователя.
@@ -51,7 +49,9 @@ class User_Answer:
             return 0
         return result[i]
 
-    def process_answer(self, result, number_question, database):
+    def process_answer(self, result, number_question, database, id_block):
+        text_min = 2000
+        text_max = 5000
         """
         Метод для обработки ответа пользователя и проверки его правильности.
 
@@ -74,8 +74,11 @@ class User_Answer:
                 break
         if right_answer == 0:
             return False
+        if count_call != 0:
+            database.collection_text.update_one({"_id": id_block},
+                                                {"$set": {f"questions.{number_question}": result}})
         self.right_answer.append(right_answer)  # bd
-        database.add_right_answer(right_answer)
+        database.add_right_answer(right_answer, id_block)
         # Обрезаем правильный ответ для пользователя
         i = -1
         size = len(result)
@@ -83,13 +86,16 @@ class User_Answer:
             i -= 1
         print(result[0:i - 1])  # Вывод обработанного результата
         answer_user = self.answerUser()  # Получение ответа пользователя
+        block_text = database.collection_book.find_one({"_id": database.id_book})['block_text']
         if answer_user == right_answer:
-            if self.block_text < self.block_text:
-                self.block_text += 100  # Изменение части текста который считываем
+            if block_text < text_max:
+                block_text += 100  # Изменение части текста который считываем
             print("Correct answer =)")
         else:
-            if self.block_text > self.block_text * 0.6:
-                self.block_text -= 200  # Изменение части текста который считываем
+            if block_text > text_min:
+                block_text -= 200  # Изменение части текста который считываем
             print("Incorrect answer =(\n")
             print(f"Correct answer - {right_answer}")  # Вывод правильного ответа в случае ошибки пользователя
+        database.collection_book.update_one({"_id": database.id_book},
+                                            {"$set": {"block_text": block_text }})
         return True

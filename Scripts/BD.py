@@ -5,7 +5,7 @@ from Scripts import Divide, BookReader, Questions, Answer_user
 
 class Database:
 
-        def __init__(self, collection_user, collection_book, collection_text, id_user, id_book):
+        def __init__(self, collection_user, collection_book, collection_text, id_user: int, id_book: int):
                 self.collection_book = collection_book
                 self.collection_user = collection_user
                 self.collection_text = collection_text
@@ -19,28 +19,36 @@ class Database:
             self.collection_text.insert_one(data)
             return id_block
 
-        def add_original_text(self, text):
+        def add_original_text(self, text, id_text):
                 original_text = {"original": text}
-                self.collection_text.update_one({"_id": self.current_block_id}, {"$set": original_text})
+                self.collection_text.update_one({"_id": id_text}, {"$set": original_text})
 
-        def add_sum_text(self, summary):
+        def add_sum_text(self, summary, id_block):
                 summary = {"sum": summary}
-                self.collection_text.update_one({"_id": self.current_block_id}, {"$set": summary})
+                self.collection_text.update_one({"_id": id_block}, {"$set": summary})
 
-        def add_sum_time_text(self, sum_time):
+        def add_sum_time_text(self, sum_time, id_block):
                 summary_time = {"sum_time": sum_time}
-                self.collection_text.update_one({"_id": self.current_block_id}, {"$set": summary_time})
+                self.collection_text.update_one({"_id": id_block}, {"$set": summary_time})
 
         def add_question(self, question):
                 self.collection_text.update_one({"_id": self.current_block_id}, {"$push": {"questions": question}})
 
-        def add_right_answer(self, right_answer):
-                self.collection_text.update_one({"_id": self.current_block_id}, {"$push": {"right_answers": right_answer}})
+        def add_right_answer(self, right_answer, id_block):
+                self.collection_text.update_one({"_id": id_block}, {"$push": {"right_answers": right_answer}})
 
-        def add_id_book(self):
+        def add_id_book(self, id_block):
                 self.collection_book.update_one({'_id': self.id_book},
-                                            {"$push": {"id_text": self.current_block_id}})
+                                            {"$push": {"id_text": id_block}})
 
+        def add_block_stop(self, block_stop: int):
+                self.collection_book.update_one({"_id": self.id_book}, {"$set": {"block_stop_book": block_stop}})
+
+        def add_chapter_stop(self, chapter_stop: int):
+                self.collection_book.update_one({"_id": self.id_book}, {"$set": {"chapter_stop_book": chapter_stop}})
+
+        def number_chapter(self, number_chapter: int, id_text: int):
+                self.collection_text.update_one({"id": id_text}, {"$set": {"number_chapter": number_chapter}})
 
 def create_document(login):
         client = MongoClient('mongodb://localhost:27017/')
@@ -95,6 +103,9 @@ def create_book(id_book, information, id_user):
         retelling = {"retelling": information['retelling']}
         id_text = {"id_text": []}
         id_User = {"id_user": id_user}
+        block_text = {"block_text": 3000}
+        status = {"status": "start"}
+        stop_process = {"stop_process": 0}
 
         collection_book.update_one({"_id": id_book}, {"$set": id_User})
 
@@ -114,6 +125,11 @@ def create_book(id_book, information, id_user):
 
         collection_book.update_one({"_id": id_book}, {"$set": chapter_stop_book})
 
+        collection_book.update_one({"_id": id_book}, {"$set": block_text})
+
+        collection_book.update_one({"_id": id_book}, {"$set": status})
+
+        collection_book.update_one({"_id": id_book}, {"$set": stop_process})
 
         document = collection_book.find_one({"_id": id_book})
         return document, collection_book

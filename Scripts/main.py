@@ -10,7 +10,7 @@ import Questions_original_text
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from Scripts import Divide, BookReader, Questions, Answer_user
-import server
+import BD
 from pymongo import MongoClient
 
 name_file = "book.txt"
@@ -39,9 +39,11 @@ def init_objects(name_file):
       if name_file is None:
             print("Other format book\n")
       chapters = Divide.split_book_by_chapters(name_file)
-      book_reader = BookReader.BookReader(name_file)
-      questions = Questions.Questions(name_file)
-      answer_user = Answer_user.User_Answer("", count_answer=4, block_text=3000)
+      book_reader = BookReader.BookReader()
+      questions = Questions.Questions()
+      book_reader.name_file = name_file
+      questions.name_file = name_file
+      answer_user = Answer_user.User_Answer("", count_answer=4)
 
       return book_reader, questions, answer_user, chapters
 
@@ -73,39 +75,41 @@ def interface(book_reader, questions, answer_user, chapters,  database):
                         answer = input("comand: ")
                         answer = int(answer)
             if answer == 1:
-                  Summarize.control(name_file, questions, answer_user, book_reader)
+                  Summarize.control(name_file, questions, answer_user, book_reader, database)
             if answer == 2:
                   if book_reader.number_chapter >= len(chapters):
                         questions = Questions.Questions(name_file)
-                        answer_user = Answer_user.User_Answer("", count_answer=4, block_text=3000)
+                        answer_user = Answer_user.User_Answer("", count_answer=4)
                   Questions_original_text.question_orig(book_reader, questions, answer_user, database)
             if answer == 3:
-                  print(database.document_book['retelling'])
+                  print(database.collection_book.find_one({"_id": database.id_book})['retelling'])
             if answer == 4:
-                  print(database.document_book['about'])
+                  print(database.collection_book.find_one({"_id": database.id_book})['description'])
             if answer == 5:
-                  if len(questions.right_answer) == 0:
+                  if database.collection_text.count_documents({}) == 0:
                         print("Read first\n")
                   else:
                         questions.questions_all_book(database)
             if answer == 6:
-                  print(database.document_book['advice'])
+                  print(database.collection_book.find_one({"_id": database.id_book})['advice'])
             if answer == 7:
                   break
 
 
 def init_documents(login, chapters, questions, answer_user, book_reader):
-      document_user, collection_user = server.init_user(login)
+      document_user, collection_user = BD.init_user(login)
       # возвращаем id книг
       # получаем id книги или создаем
       id_book = document_user['count_book'] + 1
-      document_book, collection_book = server.init_book(id_book)
+      document_book, collection_book = BD.init_book(id_book)
       if document_book is None:
             information_book = information(chapters, questions, answer_user, book_reader)
-            document_book = server.create_book(id_book, information_book, document_user['_id'])
-      collection_text = server.init_text()
-      database = server.Database(collection_user, collection_book, collection_text,
-                                 document_user['_id'], document_book['_id'])
+            document_book, collection_book = BD.create_book(id_book, information_book, document_user['_id'])
+      collection_text = BD.init_text()
+      user_id = document_user['_id']
+      book_id = document_book['_id']
+
+      database = BD.Database(collection_user, collection_book, collection_text, user_id, book_id)
       return database
 
 def main(name_file):
@@ -116,3 +120,5 @@ def main(name_file):
 
 
 main(name_file)
+
+# хранить ли главы?
