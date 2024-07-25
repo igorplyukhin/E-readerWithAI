@@ -49,7 +49,7 @@ class User_Answer:
             return 0
         return result[i]
 
-    def process_answer(self, result, number_question, database, id_block):
+    def process_answer(self, result, number_question, database, id_block, answer_user):
         text_min = 2000
         text_max = 5000
         """

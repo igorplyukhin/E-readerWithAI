@@ -39,10 +39,8 @@ def init_objects(name_file):
       if name_file is None:
             print("Other format book\n")
       chapters = Divide.split_book_by_chapters(name_file)
-      book_reader = BookReader.BookReader()
-      questions = Questions.Questions()
-      book_reader.name_file = name_file
-      questions.name_file = name_file
+      book_reader = BookReader.BookReader(name_file)
+      questions = Questions.Questions(name_file)
       answer_user = Answer_user.User_Answer("", count_answer=4)
 
       return book_reader, questions, answer_user, chapters
@@ -51,6 +49,7 @@ def init_objects(name_file):
 def information(chapters, questions, answer_user, book_reader):
       title, author = informs_book.title_book(chapters)
       information_book = {
+            "name_file": questions.name_file,
             "about": informs_book.about_book(chapters, title + ' ' + author),
             "retelling": informs_book.retelling(name_file, chapters, questions, answer_user, book_reader,
                                                 title + ' ' + author),
@@ -96,6 +95,12 @@ def interface(book_reader, questions, answer_user, chapters,  database):
                   break
 
 
+def init_user(login):
+      document_user, collection_user = BD.init_user(login)
+      database = BD.Database(collection_user, {}, {}, document_user['_id'], 0)
+      return database
+
+
 def init_documents(login, chapters, questions, answer_user, book_reader):
       document_user, collection_user = BD.init_user(login)
       # возвращаем id книг
@@ -114,8 +119,29 @@ def init_documents(login, chapters, questions, answer_user, book_reader):
 
 def main(name_file):
       login = "user777"
-      book_reader, questions, answer_user, chapters = init_objects(name_file)
-      database = init_documents(login, chapters, questions, answer_user, book_reader)
+      database = init_user(login)
+      if len(database.collection_user.find_one({'_id': database.id_user})['book_id']) != 0:
+            print(database.collection_user.find_one({'_id': database.id_user})['book_id'])
+      id_book = 1 #получаем от пользователя
+      document_book, collection_book = BD.init_book(id_book)
+      if document_book is None:
+            name_file = name_file  # достаем название файла из json
+            book_reader, questions, answer_user, chapters = init_objects(name_file)
+            information_book = information(chapters, questions, answer_user, book_reader)
+            document_book, collection_book = BD.create_book(id_book, information_book, database.id_user)
+            database.collection_user.update_one({'_id': database.id_user},
+                                            {"$push": {"book_id": id_book}})
+            database.collection_user.update_one({'_id': database.id_user},
+                                                {"$inc": {"count_book": 1}})
+      else:
+            name_file = document_book['name_file']
+            book_reader, questions, answer_user, chapters = init_objects(name_file)
+      collection_text = BD.init_text()
+      database.id_book = id_book
+      database.collection_text = collection_text
+      database.collection_book = collection_book
+      # book_reader, questions, answer_user, chapters = init_objects(name_file)
+      # database = init_documents(login, chapters, questions, answer_user, book_reader)
       interface(book_reader, questions, answer_user, chapters, database)
 
 

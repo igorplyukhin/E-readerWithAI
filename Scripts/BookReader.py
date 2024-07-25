@@ -3,7 +3,7 @@ import chardet
 
 class BookReader:
 
-    def __init__(self, count_answer=4, step_read=1, data='', count_symbols=0, end_file=True, block_text=3000):
+    def __init__(self,name_file, count_answer=4, step_read=1, data='', count_symbols=0, end_file=True, block_text=3000):
         self.count_answer = count_answer
         self.step_read = step_read
         self.data = data
@@ -17,6 +17,7 @@ class BookReader:
         self.block_original = []
         self.flag_break = False
         self.reading_times = []
+        self.name_file = name_file
 
 
     def detect_encoding(self):

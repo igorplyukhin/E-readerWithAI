@@ -12,15 +12,16 @@ def title_book(chapters):
         length = 5000
     name_book = LLaMA.llama(chapters[i][:length], "name", 0, 0, 0)
     name_book = name_book.split(':')
+
     if name_book[2][0] == " ":
-        title = name_book[2][1:]
+        author = name_book[2][1:]
     else:
-        title = name_book[2]
+        author = name_book[2]
     name_book = name_book[1].split("\n")
     if name_book[0][0] == " ":
-        author = name_book[0][1:]
+        title = name_book[0][1:]
     else:
-        author = name_book[0]
+        title = name_book[0]
     return title, author
 
 

@@ -106,8 +106,11 @@ def create_book(id_book, information, id_user):
         block_text = {"block_text": 3000}
         status = {"status": "start"}
         stop_process = {"stop_process": 0}
+        name_file = {"name_file": information['name_file']}
 
         collection_book.update_one({"_id": id_book}, {"$set": id_User})
+
+        collection_book.update_one({"_id": id_book}, {"$set": name_file})
 
         collection_book.update_one({"_id": id_book}, {"$set": title})
 
@@ -130,6 +133,8 @@ def create_book(id_book, information, id_user):
         collection_book.update_one({"_id": id_book}, {"$set": status})
 
         collection_book.update_one({"_id": id_book}, {"$set": stop_process})
+
+
 
         document = collection_book.find_one({"_id": id_book})
         return document, collection_book

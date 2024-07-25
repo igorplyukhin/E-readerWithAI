@@ -5,7 +5,8 @@ import LLaMA
 class Questions:
 
     # Запрос для второго вопроса
-    def __init__(self):
+    def __init__(self, name_file):
+        self.name_file = name_file
         #self.answer_llm = []
         self.count_questions = 0
         #self.right_answer = []
@@ -52,7 +53,12 @@ class Questions:
         for number_block in range(0, count_block, 2):
             if number_block >= count_block:
                 break
-            questions = database.collection_text.find_one({"_id": id_text[number_block]})['questions']
+            #questions = database.collection_text.find_one({"_id": id_text[number_block]})['questions']
+            questions = database.collection_text.find_one({"_id": id_text[number_block]}).get('questions', None)
+
+            if questions is None:
+                print("You didnt read book with questions(\n")
+                return
             right_answers = database.collection_text.find_one({"_id": id_text[number_block]})['right_answers']
             for count_question in range(2):
                 question = questions[count_question]
