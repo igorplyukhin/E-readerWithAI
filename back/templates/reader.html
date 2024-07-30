@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <button id="back-button">Back</button>
+        <h1>Book Reader</h1>
+        <button onclick="changeMode('summarization_time')">Summarization Time</button>
+        <button onclick="changeMode('summarization')">Summarization</button>
+        <button onclick="changeMode('questions_original_text')">Questions</button>
+        <button onclick="changeMode('test')">Test</button>
+        <button onclick="changeMode('similar_books')">Similar Books</button>
+        <div id="reader-content"></div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

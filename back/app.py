@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify,render_template
+from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO
 from concurrent.futures import ThreadPoolExecutor
 from flask_cors import CORS
@@ -34,6 +34,8 @@ executor = ThreadPoolExecutor(max_workers=3)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
 
 
 @app.route('/get_user', methods=['POST'])
@@ -82,7 +84,7 @@ def upload_book():
         file.save(file_path)
 
         # Запускаем фоновую задачу
-        #task_id = executor.submit(process_book_in_background, id_user, file_path).result()
+        # task_id = executor.submit(process_book_in_background, id_user, file_path).result()
         return jsonify(
             {"file_name": file.filename, "status": "success", "message": f"File {file.filename} uploaded successfully",
              "file_path": file_path}), 200
@@ -113,9 +115,11 @@ def process_book_in_background():
     database.collection_user.update_one({"_id": id_user}, {"$inc": {"count_book": 1}})
 
     # Уведомляем фронтенд через WebSocket
-    #socketio.emit('task_complete', {'id_book': id_book}, to=id_user)
+    # socketio.emit('task_complete', {'id_book': id_book}, to=id_user)
 
     return jsonify({"id_book": id_book})
+
+
 # def process_book_in_background(id_user, file_path):
 #     global database, book_reader, questions, answer_user
 #
@@ -205,7 +209,8 @@ def get_questions():
     if id_book not in database.collection_user.find_one({"_id": id_user})['book_id']:
         return jsonify({"questions": [],
                         "right_answers": []}), 400
-    questions, right_answers = Questions_original_text.question_orig(book_reader, questions, answer_user, database, id_block, id_book)
+    questions, right_answers = Questions_original_text.question_orig(book_reader, questions, answer_user, database,
+                                                                     id_block, id_book)
     return jsonify({"questions": questions,
                     "right_answers": right_answers}), 200
 
@@ -272,9 +277,10 @@ def back_block_text():
         database.collection_book.update_one({"_id": id_book}, {"$inc": {"count_ready_block": 1}})
     return jsonify({}), 200
 
-#back button
-#баг вопросы
-#считывание книги сделать
-#отладит код
+
+# back button
+# баг вопросы
+# считывание книги сделать
+# отладит код
 if __name__ == '__main__':
     app.run(debug=True)

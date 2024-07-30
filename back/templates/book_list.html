@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book List</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Book List</h1>
+    <ul id="book-list"></ul>
+
+    <div id="book-detail-section" style="display:none;">
+        <h2 id="book-title"></h2>
+        <p id="book-author"></p>
+        <p id="book-description"></p>
+        <button id="read-book-button">Read Book</button>
+        <button id="back-button">Back</button>
+    </div>
+
+    <div id="reading-section" style="display:none;">
+        <p id="book-text"></p>
+        <button id="prev-block-button">Previous Block</button>
+        <button id="next-block-button">Next Block</button>
+        <button id="show-questions-button">Show Questions</button>
+        <button id="back-button">Back</button>
+    </div>
+
+    <div id="questions-section" style="display:none;">
+        <div id="questions-container"></div>
+        <button id="back-button">Back</button>
+    </div>
+
+    <input type="file" id="file-input">
+    <button id="upload-button">Upload Book</button>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

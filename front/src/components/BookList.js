@@ -3,13 +3,13 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const BookList = () => {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState({ titles: [], id_books: [] });
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.post('/get_user', { login: user.login });
+        const response = await axios.post('http://localhost:5000/get_user', { login: user.login });
         if (response.status === 200) {
           setBooks(response.data);
         }
@@ -25,7 +25,7 @@ const BookList = () => {
     <div>
       <h2>My Books</h2>
       <ul>
-        {books.titles.map((title, index) => (
+        {books.titles && books.titles.map((title, index) => (
           <li key={index}>
             <Link to={`/reader/${books.id_books[index]}`}>{title}</Link>
           </li>

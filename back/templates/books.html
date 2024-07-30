@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <button id="back-button">Back</button>
+        <h1>Your Books</h1>
+        <div id="book-list-section">
+            <ul id="book-list"></ul>
+            <input type="file" id="file-input">
+            <button id="upload-button">Upload Book</button>
+        </div>
+        <div id="book-detail-section" style="display: none;">
+            <h2 id="book-title"></h2>
+            <h3 id="book-author"></h3>
+            <p id="book-description"></p>
+            <button id="read-book-button">Read Book</button>
+            <button id="show-questions-button">Show Questions</button>
+        </div>
+        <div id="reading-section" style="display: none;">
+            <div id="book-text"></div>
+            <button id="prev-block-button">Previous Block</button>
+            <button id="next-block-button">Next Block</button>
+        </div>
+        <div id="questions-section" style="display: none;">
+            <div id="questions-container"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
