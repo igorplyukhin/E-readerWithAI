@@ -13,7 +13,7 @@ from Scripts import Divide, BookReader, Questions, Answer_user
 import BD
 from pymongo import MongoClient
 
-name_file = "book.txt"
+name_file = "C:/Users/miros/PycharmProjects/BookAI/Scripts/book.txt"
 
 def help():
     print(f'1. Read the summarized version\n'

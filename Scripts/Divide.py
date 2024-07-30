@@ -56,11 +56,11 @@ def split_book_by_chapters(file_path):
 
     return chapters
 
-def split_chapters(chapters, book_reader, database):
+def split_chapters(chapters, book_reader, database, id_book):
     text = []
     while book_reader.number_chapter < len(chapters):
         book_reader.number_chapter = book_reader.reading(chapters, book_reader.number_chapter)
         id_block = database.new_block()
         database.add_original_text(book_reader.data, id_block)
-        database.add_id_book(id_block)
+        database.add_id_book(id_block, id_book)
         book_reader.data = ""

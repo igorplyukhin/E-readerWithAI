@@ -5,13 +5,11 @@ from Scripts import Divide, BookReader, Questions, Answer_user
 
 class Database:
 
-        def __init__(self, collection_user, collection_book, collection_text, id_user: int, id_book: int):
+        def __init__(self, collection_user, collection_book, collection_text):
                 self.collection_book = collection_book
                 self.collection_user = collection_user
                 self.collection_text = collection_text
-                self.id_user = id_user
-                self.id_book = id_book
-                self.current_block_id = 0
+
 
         def new_block(self):
             id_block = self.collection_text.count_documents({}) + 1
@@ -31,21 +29,21 @@ class Database:
                 summary_time = {"sum_time": sum_time}
                 self.collection_text.update_one({"_id": id_block}, {"$set": summary_time})
 
-        def add_question(self, question):
-                self.collection_text.update_one({"_id": self.current_block_id}, {"$push": {"questions": question}})
+        def add_question(self, question, block_id):
+                self.collection_text.update_one({"_id": block_id}, {"$push": {"questions": question}})
 
         def add_right_answer(self, right_answer, id_block):
                 self.collection_text.update_one({"_id": id_block}, {"$push": {"right_answers": right_answer}})
 
-        def add_id_book(self, id_block):
-                self.collection_book.update_one({'_id': self.id_book},
+        def add_id_book(self, id_block, id_book):
+                self.collection_book.update_one({'_id': id_book},
                                             {"$push": {"id_text": id_block}})
 
-        def add_block_stop(self, block_stop: int):
-                self.collection_book.update_one({"_id": self.id_book}, {"$set": {"block_stop_book": block_stop}})
+        def add_block_stop(self, block_stop: int, id_book):
+                self.collection_book.update_one({"_id": id_book}, {"$set": {"block_stop_book": block_stop}})
 
-        def add_chapter_stop(self, chapter_stop: int):
-                self.collection_book.update_one({"_id": self.id_book}, {"$set": {"chapter_stop_book": chapter_stop}})
+        def add_chapter_stop(self, chapter_stop: int, id_book):
+                self.collection_book.update_one({"_id": id_book}, {"$set": {"chapter_stop_book": chapter_stop}})
 
         def number_chapter(self, number_chapter: int, id_text: int):
                 self.collection_text.update_one({"id": id_text}, {"$set": {"number_chapter": number_chapter}})
@@ -55,14 +53,14 @@ def create_document(login):
         db = client['mydatabase']  # Имя базы данных
         collection = db['users']  # Имя коллекции для хранения сессий
         new_user_id = collection.count_documents({}) + 1
-        data = {"_id": 1,
+        data = {"_id": new_user_id,
                 "login": login}
         count_book = {"count_book": 0}
         book_id = {"book_id": []}
 
         collection.insert_one(data)
-        collection.update_one({"_id": 1}, {"$set": count_book})
-        collection.update_one({"_id": 1}, {"$set": book_id})
+        collection.update_one({"_id": new_user_id}, {"$set": count_book})
+        collection.update_one({"_id": new_user_id}, {"$set": book_id})
         document = collection.find_one({"login": login})
         return document
 
@@ -75,17 +73,13 @@ def init_user(login):
         #collection.delete_many({})  # !!!!!
         document = collection.find_one({"login": login})
         if document is None:
-                answer = input("Create account?(y/n): ")
-                while answer != 'y' and answer != 'n':
-                        answer = input("Create account?(y/n): ")
-                if answer == 'y':
-                        document = create_document(login)
+                document = create_document(login)
         #collection.update_one({"_id": 1}, {"$inc": {"count_book": 1}})
         # collection.update_one(
         #         {"_id": 1},
         #         {"$push": {"book_id": 2}}
         # )
-        return document, collection
+        return document['_id'], collection
 
 
 def create_book(id_book, information, id_user):
@@ -107,6 +101,7 @@ def create_book(id_book, information, id_user):
         status = {"status": "start"}
         stop_process = {"stop_process": 0}
         name_file = {"name_file": information['name_file']}
+        count_ready_block = {"count_ready_block": 0}
 
         collection_book.update_one({"_id": id_book}, {"$set": id_User})
 
@@ -134,6 +129,7 @@ def create_book(id_book, information, id_user):
 
         collection_book.update_one({"_id": id_book}, {"$set": stop_process})
 
+        collection_book.update_one({"_id": id_book}, {"$set": count_ready_block})
 
 
         document = collection_book.find_one({"_id": id_book})

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Reader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Book Reader</h1>
+        <div id="login-section">
+            <input type="text" id="login-input" placeholder="Enter your login">
+            <button id="login-button">Login</button>
+        </div>
+        <div id="book-list-section" style="display:none;">
+            <h2>Your Books</h2>
+            <ul id="book-list"></ul>
+            <input type="file" id="file-input">
+            <button id="upload-button">Upload Book</button>
+        </div>
+        <div id="book-detail-section" style="display:none;">
+            <h2 id="book-title"></h2>
+            <p id="book-author"></p>
+            <p id="book-description"></p>
+            <button id="read-book-button">Read Book</button>
+        </div>
+        <div id="reading-section" style="display:none;">
+            <div id="book-text"></div>
+            <button id="prev-block-button">Previous</button>
+            <button id="next-block-button">Next</button>
+            <button id="show-questions-button">Show Questions</button>
+        </div>
+        <div id="questions-section" style="display:none;">
+            <h2>Questions</h2>
+            <div id="questions-container"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

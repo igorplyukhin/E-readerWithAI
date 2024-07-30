@@ -30,7 +30,7 @@ class User_Answer:
             answer_user = input("Your answer: ")
         return answer_user
 
-    def search_right_answer(self, result):
+    def search_right_answer(self, result, number_question, database, id_block):
         """
         Метод для поиска правильного ответа.
 
@@ -47,9 +47,23 @@ class User_Answer:
             i -= 1
         if a_llm.right_answer(result[i], result):
             return 0
-        return result[i]
+        right_answer = result[i]
+        count_call = 0
+        while right_answer == 0:
+            if number_question == 0:
+                result = LLaMA.llama(self.data, "questions", 0, 0, 0)  # Выполнение запроса к внешнему API
+            else:
+                result = LLaMA.llama(self.data, "questions_add", 0, 0, 0)  # Выполнение запроса к внешнему API
+            right_answer = self.search_right_answer(result, number_question, database, id_block)  # Повторный поиск правильного ответа
+            count_call += 1
+            if count_call == 3:
+                break
+        if count_call != 0:
+            database.collection_text.update_one({"_id": id_block},
+                                                {"$set": {f"questions.{number_question}": result}})
+        return right_answer
 
-    def process_answer(self, result, number_question, database, id_block, answer_user):
+    def process_answer(self, result, number_question, database, id_block, answer_user, id_book):
         text_min = 2000
         text_max = 5000
         """
@@ -77,8 +91,7 @@ class User_Answer:
         if count_call != 0:
             database.collection_text.update_one({"_id": id_block},
                                                 {"$set": {f"questions.{number_question}": result}})
-        self.right_answer.append(right_answer)  # bd
-        database.add_right_answer(right_answer, id_block)
+        #database.add_right_answer(right_answer, id_block)
         # Обрезаем правильный ответ для пользователя
         i = -1
         size = len(result)
@@ -86,7 +99,7 @@ class User_Answer:
             i -= 1
         print(result[0:i - 1])  # Вывод обработанного результата
         answer_user = self.answerUser()  # Получение ответа пользователя
-        block_text = database.collection_book.find_one({"_id": database.id_book})['block_text']
+        block_text = database.collection_book.find_one({"_id": id_book})['block_text']
         if answer_user == right_answer:
             if block_text < text_max:
                 block_text += 100  # Изменение части текста который считываем
@@ -96,6 +109,6 @@ class User_Answer:
                 block_text -= 200  # Изменение части текста который считываем
             print("Incorrect answer =(\n")
             print(f"Correct answer - {right_answer}")  # Вывод правильного ответа в случае ошибки пользователя
-        database.collection_book.update_one({"_id": database.id_book},
-                                            {"$set": {"block_text": block_text }})
+        database.collection_book.update_one({"_id": id_book},
+                                            {"$set": {"block_text": block_text}})
         return True

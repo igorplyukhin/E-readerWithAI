@@ -56,15 +56,16 @@ def extract_text(root):
 
 
 # Функция для обработки fb2 файла
-def process_fb2(name_file):
+def process_fb2(file_name_without_exp, name_file):
     # Парсинг файла fb2
-    tree = parse_fb2(name_file)
-    encoding = detect_encoding(name_file)
+    file_path = f'Scripts/{name_file}'
+    tree = parse_fb2(file_path)
+    encoding = detect_encoding(file_path)
     # Извлечение текста, автора и названия книги
     book_text, author, book_title = extract_text(tree)
 
     # Запись текста книги в файл TXT
-    output_file = "fb2-txt.txt"
+    output_file = f"{file_name_without_exp}.txt"
     with open(output_file, 'w', encoding=encoding) as f:
         f.write(book_text)
     return output_file

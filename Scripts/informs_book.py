@@ -65,3 +65,9 @@ def advice_book(chapters, name_book):
         result = LLaMA.llama(result, "translate", 0, 0, 0)
         text = result
     return text
+
+
+
+
+
+
