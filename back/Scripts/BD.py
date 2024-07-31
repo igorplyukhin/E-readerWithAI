@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from Scripts import Divide, BookReader, Questions, Answer_user
 
+client = MongoClient('mongodb://reading_books_ai_mongo:27017/')
+
 
 class Database:
 
@@ -9,7 +11,6 @@ class Database:
                 self.collection_book = collection_book
                 self.collection_user = collection_user
                 self.collection_text = collection_text
-
 
         def new_block(self):
             id_block = self.collection_text.count_documents({}) + 1
@@ -49,7 +50,6 @@ class Database:
                 self.collection_text.update_one({"id": id_text}, {"$set": {"number_chapter": number_chapter}})
 
 def create_document(login):
-        client = MongoClient('mongodb://localhost:27017/')
         db = client['mydatabase']  # Имя базы данных
         collection = db['users']  # Имя коллекции для хранения сессий
         new_user_id = collection.count_documents({}) + 1
@@ -67,7 +67,6 @@ def create_document(login):
 
 def init_user(login):
         # Настройка подключения к MongoDB
-        client = MongoClient('mongodb://localhost:27017/')
         db = client['mydatabase']  # Имя базы данных
         collection = db['users']  # Имя коллекции для хранения сессий
         #collection.delete_many({})  # !!!!!
@@ -83,7 +82,6 @@ def init_user(login):
 
 
 def create_book(id_book, information, id_user):
-        client = MongoClient('mongodb://localhost:27017/')
         db = client['mydatabase']  # Имя базы данных
         collection_book = db['user_book']
         data = {"_id": id_book}
@@ -137,7 +135,6 @@ def create_book(id_book, information, id_user):
 
 
 def init_book(id_book):
-        client = MongoClient('mongodb://localhost:27017/')
         db = client['mydatabase']  # Имя базы данных
         collection_book = db['user_book']
         document = collection_book.find_one({"_id": id_book})
@@ -145,7 +142,6 @@ def init_book(id_book):
 
 
 def init_text():
-        client = MongoClient('mongodb://localhost:27017/')
         db = client['mydatabase']  # Имя базы данных
         collection_text = db['book_text']
         return collection_text

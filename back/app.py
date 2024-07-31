@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-from flask_socketio import SocketIO
 from concurrent.futures import ThreadPoolExecutor
 from flask_cors import CORS
 import sys
@@ -17,7 +16,6 @@ import Scripts.Divide as Divide
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -283,4 +281,4 @@ def back_block_text():
 # считывание книги сделать
 # отладит код
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

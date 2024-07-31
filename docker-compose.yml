@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  reading_books_ai_back:
+    container_name: reading_books_ai_back
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5022:5000"
+    networks:
+      - reading_books_ai_network
+  reading_books_ai_mongo:
+    image: mongo:latest
+    container_name: reading_books_ai_mongo
+    ports:
+      - '27018:27017'
+    restart: always
+    volumes:
+      - db-data:/data/db
+      - ./test-data/:/docker-entrypoint-initdb.d/
+    networks:
+      - reading_books_ai_network
+networks:
+  reading_books_ai_network:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
