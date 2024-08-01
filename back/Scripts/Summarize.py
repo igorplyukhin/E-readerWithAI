@@ -81,6 +81,7 @@ def process_chunk(book_reader,  mode, database, id_book):
             number_block += 1
             database.collection_book.update_one({"_id": id_book}, {"$set": {"stop_process": number_block}})
             book_reader.data = ""
+            time.sleep(7)
         else:
             break
 
