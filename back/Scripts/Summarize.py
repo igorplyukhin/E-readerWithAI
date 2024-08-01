@@ -95,9 +95,20 @@ def get_text(database, book_reader, mode, id_book):
     # print(f"\n{arr_block[book_reader.count_block]}")
     else:
         if mode == "sum":
-            text = database.collection_text.find_one({"_id": id_block})['sum']
-        if mode == "time":
-            text = database.collection_text.find_one({"_id": id_block})['sum_time']
+            document = database.collection_text.find_one({"_id": id_block})
+            if document and 'sum' in document:
+                text = document['sum']
+            else:
+                # Обработка случая, когда поле 'sum' отсутствует
+                text = document['original']
+
+        elif mode == "time":
+            document = database.collection_text.find_one({"_id": id_block})
+            if document and 'sum_time' in document:
+                text = document['sum_time']
+            else:
+                # Обработка случая, когда поле 'sum_time' отсутствует
+                text = document['original']
     return text, id_block
 
 

@@ -35,10 +35,21 @@ def question_orig(book_reader, questions, answer_user, database, id_block, id_bo
         # print(text)
         mode = database.collection_book.find_one({"_id":  id_book})['mode']
         text = database.collection_text.find_one({'_id': id_block})['original']
-        # if mode == 'summarization_time':
-        #     text = database.collection_text.find_one({'_id': id_block})['sum_time']
-        # if mode == 'summarization':
-        #     text = database.collection_text.find_one({'_id': id_block})['sum']
+        if mode == "summarization":
+            document = database.collection_text.find_one({"_id": id_block})
+            if document and 'sum' in document:
+                text = document['sum']
+            else:
+                # Обработка случая, когда поле 'sum' отсутствует
+                text = document['original']
+
+        elif mode == "summarization_time":
+            document = database.collection_text.find_one({"_id": id_block})
+            if document and 'sum_time' in document:
+                text = document['sum_time']
+            else:
+                # Обработка случая, когда поле 'sum_time' отсутствует
+                text = document['original']
 
         book_reader.data = text
         # id_text = database.collection_book.find_one({"_id": database.id_book})['id_text']
