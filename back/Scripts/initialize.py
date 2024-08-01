@@ -9,9 +9,10 @@ import BD
 
 
 def check_extension(name_file):
-    file_name, file_exp = os.path.splitext(f"uploads/{name_file}")  # Убрать
+    file_name, file_exp = os.path.splitext(name_file)
     if file_exp == ".fb2":
-        file_name = ParserFB2.process_fb2(file_name, name_file)
+        file_name = ParserFB2.process_fb2(file_name, f'uploads/{name_file}')
+        print(file_name, file_exp)
         return file_name
     if file_exp == ".txt":
         return name_file

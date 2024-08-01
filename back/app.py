@@ -80,11 +80,11 @@ def upload_book():
     if file:
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
-
+        file_name = initialize.check_extension(file.filename)
         # Запускаем фоновую задачу
         # task_id = executor.submit(process_book_in_background, id_user, file_path).result()
         return jsonify(
-            {"file_name": file.filename, "status": "success", "message": f"File {file.filename} uploaded successfully",
+            {"file_name": file_name, "status": "success", "message": f"File {file_name} uploaded successfully",
              "file_path": file_path}), 200
 
 
@@ -158,8 +158,8 @@ def get_book():
                         'description': ""
                         }), 400
     document_book, collection_book = BD.init_book(id_book)
-    name_file = document_book['name_file']
-    book_reader, questions, answer_user, chapters = initialize.init_objects(name_file)
+    file_path = document_book['name_file']
+    book_reader, questions, answer_user, chapters = initialize.init_objects(file_path)
     collection_text = BD.init_text()
     database.collection_text = collection_text
     database.collection_book = collection_book

@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from Scripts import Divide, BookReader, Questions, Answer_user
 
-client = MongoClient('mongodb://reading_books_ai_mongo:27017/')
+#client = MongoClient('mongodb://reading_books_ai_mongo:27017/')
+client = MongoClient('mongodb://localhost:27017')
 
 
 class Database:
@@ -95,7 +96,7 @@ def create_book(id_book, information, id_user):
         retelling = {"retelling": information['retelling']}
         id_text = {"id_text": []}
         id_User = {"id_user": id_user}
-        block_text = {"block_text": 3000}
+        block_text = {"block_text": 2000}
         status = {"status": "start"}
         stop_process = {"stop_process": 0}
         name_file = {"name_file": information['name_file']}

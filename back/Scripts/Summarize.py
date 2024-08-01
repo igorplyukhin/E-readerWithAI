@@ -101,9 +101,8 @@ def get_text(database, book_reader, mode, id_book):
 
 
 # Главная асинхронная функция для управления процессом чтения и суммаризации
-def process_text(name_file, book_reader, mode, database, id_book):
+def process_text(file_path, book_reader, mode, database, id_book):
     #book_reader.flag_break = False
-    file_path = f"uploads/{name_file}"
     if database.collection_book.find_one({'_id': id_book})['status'] == 'start':
 
         chapters = Divide.split_book_by_chapters(file_path)
