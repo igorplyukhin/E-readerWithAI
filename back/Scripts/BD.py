@@ -2,8 +2,7 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from Scripts import Divide, BookReader, Questions, Answer_user
 
-#client = MongoClient('mongodb://reading_books_ai_mongo:27017/')
-client = MongoClient('mongodb://localhost:27017')
+client = MongoClient('mongodb://reading_books_ai_mongo:27017/')
 
 
 class Database:
