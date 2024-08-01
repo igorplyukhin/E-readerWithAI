@@ -207,9 +207,9 @@ def get_questions():
     if id_book not in database.collection_user.find_one({"_id": id_user})['book_id']:
         return jsonify({"questions": [],
                         "right_answers": []}), 400
-    questions, right_answers = Questions_original_text.question_orig(book_reader, questions, answer_user, database,
+    questions_list, right_answers = Questions_original_text.question_orig(book_reader, questions, answer_user, database,
                                                                      id_block, id_book)
-    return jsonify({"questions": questions,
+    return jsonify({"questions": questions_list,
                     "right_answers": right_answers}), 200
 
 
