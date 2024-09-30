@@ -9,8 +9,12 @@ services:
     restart: always
     ports:
       - "5022:5000"
+    volumes:
+      - ./back/uploads:/app/uploads  # Обратите внимание на путь
     networks:
       - reading_books_ai_network
+    depends_on:
+      - reading_books_ai_mongo
   reading_books_ai_mongo:
     image: mongo:latest
     container_name: reading_books_ai_mongo

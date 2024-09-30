@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const backButton = document.getElementById('back-button');
+    const readingSection = document.getElementById('reading-section'); // Добавьте эту строку
 
     let currentUser = null;
     let currentBook = null;
@@ -81,20 +82,34 @@ document.addEventListener('DOMContentLoaded', function() {
         bookAuthor.textContent = book.author;
         bookDescription.textContent = book.description;
         currentBook = book.book_id;
+        console.log('Current Book ID:', currentBook);
     }
 
-    // Read book button click
+    // Обработчик кнопки "Read Book"
     readBookButton.addEventListener('click', function() {
-        fetch('/get_text', {
+        // Устанавливаем режим перед получением текста
+        fetch('/change_mode', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id_user: currentUser, id_book: currentBook })
+            body: JSON.stringify({ id_user: currentUser, id_book: currentBook, mode: 'summarization' })
         })
         .then(response => response.json())
-        .then(data => {
-            displayBookText(data);
+        .then(() => {
+            // Теперь получаем текст книги
+            fetch('/get_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id_user: currentUser, id_book: currentBook })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayBookText(data);
+            })
+            .catch(error => console.error('Error:', error));
         })
         .catch(error => console.error('Error:', error));
     });
@@ -203,7 +218,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                // Optionally, refresh the book list or provide feedback to the user
+                // После успешной загрузки книги обновляем список книг
+                fetch('/get_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ login: loginInput.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayBookList(data); // Обновляем список книг
+                })
+                .catch(error => console.error('Error:', error));
             })
             .catch(error => console.error('Error:', error));
         } else {
