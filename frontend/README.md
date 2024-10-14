@@ -1,1 +1,0 @@
-# E-readerWithAI frontend
