@@ -22,7 +22,7 @@ object DatabaseFactory {
      */
     fun init() {
         try {
-            val connectionString = System.getenv("MONGODB_URI") ?: "mongodb://mongo:27017/bookdb"
+            val connectionString = System.getenv("MONGODB_URI") ?: "mongodb://mongo:27018/bookdb"
             val dbName = "bookdb" // Или можно извлечь из строки подключения
 
             logger.info("Инициализация подключения к MongoDB с строкой подключения: $connectionString")

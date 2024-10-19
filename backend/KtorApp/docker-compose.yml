@@ -16,7 +16,7 @@ services:
   mongo:
     image: mongo:8.0 # Использование конкретной версии
     ports:
-      - "27017:27017"
+      - "27018:27017"  # Изменен внешний порт на 27018
     volumes:
       - mongo_data:/data/db
     environment:
