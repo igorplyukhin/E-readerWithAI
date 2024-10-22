@@ -55,9 +55,7 @@ fun Route.textRoutes() {
 
         when (book.mode) {
             "summarization_time" -> {
-                // Если суммированный текст с учетом времени не готов, запускаем фоновую обработку
                 if (textBlock.summaryTime == null) {
-                    // Запускаем фоновую обработку
                     BackgroundProcessing.processSummarizationForBlock(textBlock, mode = "summarization_time")
                     call.respond(HttpStatusCode.Accepted, "Суммирование с учетом времени чтения запущено. Попробуйте позже.")
                 } else {
@@ -65,9 +63,7 @@ fun Route.textRoutes() {
                 }
             }
             "summarization" -> {
-                // Если суммированный текст не готов, запускаем фоновую обработку
                 if (textBlock.summary == null) {
-                    // Запускаем фоновую обработку
                     BackgroundProcessing.processSummarizationForBlock(textBlock, mode = "summarization")
                     call.respond(HttpStatusCode.Accepted, "Суммирование запущено. Попробуйте позже.")
                 } else {
@@ -82,6 +78,7 @@ fun Route.textRoutes() {
             }
         }
     }
+
 
     // Маршрут для получения вопросов по текстовому блоку
     post("/get_questions") {
@@ -116,9 +113,7 @@ fun Route.textRoutes() {
         val textBlock = textBlockDoc.toTextBlock()
 
         if (textBlock.questions.isEmpty()) {
-            // Генерируем вопросы и ответы
             val (questions, answers) = BackgroundProcessing.generateQuestionsForBlock(textBlock.original)
-            // Обновляем текстовый блок в базе данных
             textBlocksCollection.updateOne(
                 Document("_id", idBlock),
                 Updates.combine(

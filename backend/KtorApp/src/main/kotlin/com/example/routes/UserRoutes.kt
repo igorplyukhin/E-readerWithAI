@@ -30,57 +30,28 @@ fun Route.userRoutes() {
 
         if (userDoc != null) {
             val user = userDoc.toUser()
-            val booksCollection = DatabaseFactory.getBooksCollection()
-            val books = booksCollection.find(Filters.`in`("_id", user.bookIds.map { ObjectId(it) }))
-                .map { it.toBook() }
-                .toList()
 
-            val response = UserBooksResponse(
-                count_book = books.size,
-                books = books
-            )
-            call.respond(response)
-        } else {
-            // Создаем нового пользователя
-            val newUser = User(idUser = login)
-            usersCollection.insertOne(newUser.toDocument())
+            if (user.bookIds.isNotEmpty()) {
+                val booksCollection = DatabaseFactory.getBooksCollection()
 
-            val response = UserBooksResponse(
-                count_book = 0,
-                books = emptyList()
-            )
-            call.respond(response)
-        }
-    }
+                // Преобразуем каждый ID книги в ObjectId для правильного поиска
+                val objectIdList = user.bookIds.map { ObjectId(it) }
 
+                // Найдем книги по списку ObjectId
+                val books = booksCollection.find(Filters.`in`("_id", objectIdList))
+                    .map { it.toBook() }
+                    .toList()
 
-    // Маршрут для получения списка книг пользователя
-    post("/get_user_books") {
-        val parameters = call.receiveParameters()
-        val userId = parameters["id"]
-
-        if (userId == null) {
-            call.respond(HttpStatusCode.BadRequest, "User ID not provided")
-            return@post
-        }
-
-        val usersCollection = DatabaseFactory.getUsersCollection()
-        val userDoc = usersCollection.find(Filters.eq("_id", userId)).firstOrNull()
-
-        if (userDoc != null) {
-            val user = userDoc.toUser()
-            val booksCollection = DatabaseFactory.getBooksCollection()
-            val books = booksCollection.find(Filters.`in`("_id", user.bookIds.map { ObjectId(it) }))
-                .map { it.toBook() }
-                .toList()
-
-            if (books.isNotEmpty()) {
-                call.respond(HttpStatusCode.OK, books)
+                val response = UserBooksResponse(
+                    count_book = books.size,
+                    books = books
+                )
+                call.respond(response)
             } else {
-                call.respond(HttpStatusCode.NotFound, mapOf("status" to "error", "message" to "No books found for this user"))
+                call.respond(HttpStatusCode.OK, UserBooksResponse(count_book = 0, books = emptyList()))
             }
         } else {
-            call.respond(HttpStatusCode.NotFound, "User not found")
+            call.respond(HttpStatusCode.NotFound, "Пользователь не найден")
         }
     }
 
@@ -153,22 +124,29 @@ fun Route.userRoutes() {
         val parameters = call.receiveParameters()
         val login = parameters["login"]
         val newPassword = parameters["new_password"]
+        val oldPassword = parameters["old_password"] // Валидация старого пароля
 
-        if (login == null || newPassword == null) {
+        if (login == null || newPassword == null || oldPassword == null) {
             call.respond(HttpStatusCode.BadRequest, "Не предоставлены необходимые параметры")
             return@post
         }
 
         val usersCollection = DatabaseFactory.getUsersCollection()
-        val result = usersCollection.updateOne(
-            Filters.eq("_id", login),
-            Document("\$set", Document("password", newPassword))
-        )
+        val userDoc = usersCollection.find(Filters.eq("_id", login)).firstOrNull()
 
-        if (result.modifiedCount > 0) {
-            call.respond(HttpStatusCode.OK, "Пароль успешно обновлен")
+        if (userDoc != null && userDoc.getString("password") == oldPassword) {
+            val result = usersCollection.updateOne(
+                Filters.eq("_id", login),
+                Document("\$set", Document("password", newPassword))
+            )
+
+            if (result.modifiedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Пароль успешно обновлен")
+            } else {
+                call.respond(HttpStatusCode.InternalServerError, "Не удалось обновить пароль")
+            }
         } else {
-            call.respond(HttpStatusCode.NotFound, "Пользователь не найден")
+            call.respond(HttpStatusCode.Unauthorized, "Старый пароль неверен или пользователь не найден")
         }
     }
 
@@ -176,19 +154,26 @@ fun Route.userRoutes() {
     post("/delete_user") {
         val parameters = call.receiveParameters()
         val login = parameters["login"]
+        val password = parameters["password"] // Подтверждение пароля
 
-        if (login == null) {
-            call.respond(HttpStatusCode.BadRequest, "Логин не предоставлен")
+        if (login == null || password == null) {
+            call.respond(HttpStatusCode.BadRequest, "Логин или пароль не предоставлен")
             return@post
         }
 
         val usersCollection = DatabaseFactory.getUsersCollection()
-        val result = usersCollection.deleteOne(Filters.eq("_id", login))
+        val userDoc = usersCollection.find(Filters.eq("_id", login)).firstOrNull()
 
-        if (result.deletedCount > 0) {
-            call.respond(HttpStatusCode.OK, "Пользователь успешно удален")
+        if (userDoc != null && userDoc.getString("password") == password) {
+            val result = usersCollection.deleteOne(Filters.eq("_id", login))
+
+            if (result.deletedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Пользователь успешно удален")
+            } else {
+                call.respond(HttpStatusCode.InternalServerError, "Не удалось удалить пользователя")
+            }
         } else {
-            call.respond(HttpStatusCode.NotFound, "Пользователь не найден")
+            call.respond(HttpStatusCode.Unauthorized, "Неверный пароль или пользователь не найден")
         }
     }
 }

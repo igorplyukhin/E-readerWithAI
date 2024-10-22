@@ -49,3 +49,4 @@ fun Application.configureRouting() {
 fun Application.configureDatabase() {
     DatabaseFactory.init()
 }
+

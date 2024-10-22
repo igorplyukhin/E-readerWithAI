@@ -62,4 +62,10 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests:2.3.4")
     testImplementation(kotlin("test"))
+
+    // FB2 и PDF
+    implementation ("org.apache.pdfbox:pdfbox:2.0.27")
+    implementation("org.simpleframework:simple-xml:2.7.1")
+
+
 }

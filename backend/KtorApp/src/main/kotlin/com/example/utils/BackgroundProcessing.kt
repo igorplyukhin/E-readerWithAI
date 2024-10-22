@@ -13,19 +13,14 @@ object BackgroundProcessing {
      * Фоновая обработка загруженной книги.
      * @param idUser ID пользователя, загрузившего книгу.
      * @param filePath Путь к файлу книги на сервере.
-     */
-    /**
-     * Фоновая обработка загруженной книги.
-     * @param idUser ID пользователя, загрузившего книгу.
-     * @param filePath Путь к файлу книги на сервере.
      * @param nameFile Название файла книги.
      */
-    suspend fun processBookInBackground(idUser: String, filePath: String, nameFile: String) {
+    suspend fun processBookInBackground(idUser: String, filePath: String, nameFile: String, fileType: String) {
         withContext(Dispatchers.IO) {
             // Инициализация объектов для работы с книгой
             val bookProcessor = BookProcessor(filePath, nameFile)
-            val chapters = bookProcessor.getChapters()
-            var book = bookProcessor.getBook()
+            val chapters = bookProcessor.getChapters(fileType)  // Передаем fileType
+            var book = bookProcessor.getBook(fileType)          // Передаем fileType
 
             // Создание записи о книге в базе данных
             val booksCollection = DatabaseFactory.getBooksCollection()
@@ -45,18 +40,17 @@ object BackgroundProcessing {
             for ((chapterIndex, chapter) in chapters.withIndex()) {
                 val blocks = bookProcessor.divideChapterIntoBlocks(chapter)
                 for (block in blocks) {
-                    val idBlock = ObjectId().toString()
                     val textBlock = TextBlock(
-                        idBlock = idBlock,
+                        _id = ObjectId().toString(), // Используем _id вместо idBlock
                         original = block,
                         numberChapter = chapterIndex + 1
                     )
                     textBlocks.add(textBlock.toDocument())
 
-                    // Связывание блоков с книгой
+                    // Связывание блоков с книгой (заменили idBlock на _id)
                     booksCollection.updateOne(
                         Filters.eq("_id", bookId),
-                        Updates.push("textBlockIds", idBlock)
+                        Updates.push("textBlockIds", textBlock._id) // Теперь сохраняем _id
                     )
                 }
             }
@@ -91,7 +85,7 @@ object BackgroundProcessing {
 
             val updateField = if (mode == "summarization") "summary" else "summaryTime"
             textBlocksCollection.updateOne(
-                Filters.eq("_id", textBlock.idBlock),
+                Filters.eq("_id", textBlock._id), // Заменяем idBlock на _id
                 Updates.set(updateField, summarizedText)
             )
         }
@@ -121,7 +115,7 @@ object BackgroundProcessing {
                 // Обновляем текстовый блок в базе данных
                 val updateField = if (mode == "summarization") "summary" else "summaryTime"
                 textBlocksCollection.updateOne(
-                    Filters.eq("_id", block.idBlock),
+                    Filters.eq("_id", block._id), // Используем _id вместо idBlock
                     Updates.set(updateField, summarizedText)
                 )
             }
@@ -190,7 +184,7 @@ object BackgroundProcessing {
 
             // Обновляем текстовый блок в базе данных
             textBlocksCollection.updateOne(
-                Filters.eq("_id", block.idBlock),
+                Filters.eq("_id", block._id), // Используем _id вместо idBlock
                 Updates.combine(
                     Updates.set("questions", blockQuestions),
                     Updates.set("rightAnswers", blockAnswers)
