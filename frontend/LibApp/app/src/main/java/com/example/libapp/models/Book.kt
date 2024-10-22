@@ -5,6 +5,7 @@ data class Book(
     val title: String,
     val author: String,
     val description: String,
+    val annotation: String?,
     val nameFile: String,
-    val filePath: String
+    val filePath: String,
 )

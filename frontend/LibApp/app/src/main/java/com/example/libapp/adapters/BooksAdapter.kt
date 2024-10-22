@@ -10,15 +10,15 @@ import com.example.libapp.models.Book
 
 class BooksAdapter(
     private val books: List<Book>,
-    private val onClick: (Book) -> Unit
+    private val onItemClick: (Book) -> Unit
 ) : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
 
     inner class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvBookTitle: TextView = view.findViewById(R.id.tvBookTitle)
 
         fun bind(book: Book) {
-            tvBookTitle.text = book.title // Предположим, что `title` - это поле в объекте `Book`
-            itemView.setOnClickListener { onClick(book) }
+            tvBookTitle.text = book.title // Отображаем название книги
+            itemView.setOnClickListener { onItemClick(book) }
         }
     }
 

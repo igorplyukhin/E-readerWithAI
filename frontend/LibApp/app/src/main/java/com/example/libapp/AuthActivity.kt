@@ -11,6 +11,7 @@ import com.example.libapp.models.UserResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.activity.enableEdgeToEdge
 
 class AuthActivity : AppCompatActivity() {
 
@@ -18,6 +19,7 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_auth)
 
         val etLogin = findViewById<EditText>(R.id.etLogin)
