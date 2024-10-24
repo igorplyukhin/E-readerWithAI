@@ -28,7 +28,10 @@ class BookReadingActivity : AppCompatActivity() {
     private var bookId: String? = null
     private var totalPages: Int = 0
     private val pages: MutableList<String> = mutableListOf()
-
+    private var currentPageWordCount: Int = 0
+    private var totalWordsRead: Int = 0
+    private var readingSpeedWPM: Float = 0f
+    private var lastCalculatedReadingSpeed: Float = 0f
     private var sessionReadingTime: Long = 0
     private var totalReadingTime: Long = 0
     private var startTime: Long = 0
@@ -37,15 +40,31 @@ class BookReadingActivity : AppCompatActivity() {
     private val updateReadingTimeRunnable = object : Runnable {
         override fun run() {
             if (startTime != 0L) {
-                sessionReadingTime += 5000 // Инкрементируем на 5 секунд
+                sessionReadingTime += 5000
                 totalReadingTime += 5000
-                Log.d("BookReadingActivity", "Session Reading Time: $sessionReadingTime ms")
-                Log.d("BookReadingActivity", "Total Reading Time: $totalReadingTime ms")
+                calculateReadingSpeed() // Вызываем расчет скорости чтения
                 Log.d("BookReadingActivity", "Session: $sessionReadingTime ms, Total: $totalReadingTime ms")
             }
-            handler.postDelayed(this, 5000) // Обновляем каждые 5 секунд
+            handler.postDelayed(this, 5000)
         }
     }
+
+    private fun resetSessionReadingTime() {
+        if (lastCalculatedReadingSpeed > 0) {
+            Log.d("ReadingMetrics", "Page completed:")
+            Log.d("ReadingMetrics", "Speed: ${String.format("%.2f", lastCalculatedReadingSpeed)} WPM")
+            Log.d("ReadingMetrics", "Average: ${String.format("%.2f", readingSpeedWPM)} WPM")
+        }
+        sessionReadingTime = 0
+        lastCalculatedReadingSpeed = 0f
+        Log.d("BookReadingActivity", "Session Reset")
+    }
+
+    // Добавляем функцию подсчета слов
+    private fun countWordsInText(text: String): Int {
+        return text.trim().split("\\s+".toRegex()).size
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +91,14 @@ class BookReadingActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 tvPageIndicator.text = "${position + 1}/$totalPages"
+
+                // Добавляем подсчет слов для текущей страницы
+                if (position < pages.size) {
+                    currentPageWordCount = countWordsInText(pages[position])
+                    totalWordsRead += currentPageWordCount
+                    Log.d("BookReadingActivity", "Words on current page: $currentPageWordCount")
+                }
+
                 Log.d("BookReadingActivity", "Page Selected: ${position + 1}")
                 Log.d("BookReadingActivity", "Session Reading Time before reset: $sessionReadingTime ms")
                 resetSessionReadingTime()
@@ -91,6 +118,7 @@ class BookReadingActivity : AppCompatActivity() {
         stopTiming()
     }
 
+
     private fun startTiming() {
         startTime = System.currentTimeMillis()
         handler.post(updateReadingTimeRunnable)
@@ -101,10 +129,29 @@ class BookReadingActivity : AppCompatActivity() {
         startTime = 0
     }
 
-    private fun resetSessionReadingTime() {
-        sessionReadingTime = 0
-        Log.d("BookReadingActivity", "Session Reading Time Reset")
+    private fun calculateReadingSpeed() {
+        if (sessionReadingTime > 0 && currentPageWordCount > 0) {
+            val minutesSpent = sessionReadingTime / 60000.0f
+            if (minutesSpent > 0) {
+                lastCalculatedReadingSpeed = currentPageWordCount / minutesSpent
+
+                Log.d("ReadingMetrics", "===============")
+                Log.d("ReadingMetrics", "Words on current page: $currentPageWordCount")
+                Log.d("ReadingMetrics", "Time spent: ${String.format("%.2f", minutesSpent)} minutes")
+                Log.d("ReadingMetrics", "Reading speed: ${String.format("%.2f", lastCalculatedReadingSpeed)} WPM")
+                Log.d("ReadingMetrics", "Total words read: $totalWordsRead")
+                Log.d("ReadingMetrics", "===============")
+
+                // Сохраняем среднюю скорость чтения
+                readingSpeedWPM = if (readingSpeedWPM == 0f) {
+                    lastCalculatedReadingSpeed
+                } else {
+                    (readingSpeedWPM + lastCalculatedReadingSpeed) / 2
+                }
+            }
+        }
     }
+
 
     private fun fetchTotalPages(bookId: String) {
         Log.d("BookReadingActivity", "Fetching total pages for book ID: $bookId")
