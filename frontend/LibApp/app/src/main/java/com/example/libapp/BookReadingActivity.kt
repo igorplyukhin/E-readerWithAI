@@ -132,7 +132,3 @@ class BookReadingActivity : AppCompatActivity() {
         viewPager.visibility = View.VISIBLE
     }
 }
-
-
-
-

@@ -135,7 +135,12 @@ class BooksActivity : AppCompatActivity() {
 
         val userIdBody = userId.toRequestBody("text/plain".toMediaTypeOrNull())
         val file = uriToFile(fileUri)
-        val requestFile = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+
+        // Определяем MIME-тип файла
+        val contentResolver = applicationContext.contentResolver
+        val mimeType = contentResolver.getType(fileUri) ?: "application/octet-stream"
+
+        val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
         val filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
         ApiClient.instance.uploadBook(userIdBody, filePart).enqueue(object : Callback<BookResponse> {
