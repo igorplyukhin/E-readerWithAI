@@ -103,3 +103,55 @@ gradle-user-home
 .kotlin
 
 scan-journal.log
+
+
+#Python
+# Общие файлы и директории
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.whl
+*.log
+*.DS_Store
+
+# Виртуальные окружения
+venv/
+env/
+.venv/
+.env/
+env.bak/
+venv.bak/
+
+# Конфигурационные файлы
+*.sqlite3
+*.db
+*.json
+
+# Папки для кэша
+.cache/
+.pytest_cache/
+.coverage
+.coverage.*
+nosetests.xml
+test.xml
+coverage.xml
+*.hypothesis/
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+#Прочие файлы
+*.pdf
+*.txt
+*.fb2
+!requirements.txt
