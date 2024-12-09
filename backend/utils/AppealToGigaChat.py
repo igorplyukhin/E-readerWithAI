@@ -83,8 +83,7 @@ async def choice_action(file: UploadFile, action: Literal['compress', 'tests'], 
               f"Исходный текст: \n{blocks}"
           ) """
         result = send_to_gigachat(prompt, "5", temperature, top_p)
-        print(result)
-        return {"number_of_chunks": len(blocks), "compress_text": result}
+        return result
 
     
 
