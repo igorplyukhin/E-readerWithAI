@@ -1,81 +1,91 @@
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass
-
-@dataclass
-class BookText:
-    title: str
-    authors: str
-    content: str
-    annotation: str
+from models.BookText import BookText
 
 class Fb2Processor:
     def __init__(self, file_path: str):
         self.file_path = file_path
+        self.ns = {'fb2': 'http://www.gribuser.ru/xml/fictionbook/2.0'}
 
     def extract_book_text(self) -> BookText:
-        try:
-            tree = ET.parse(self.file_path)
-            root = tree.getroot()
-        except Exception as e:
-            raise Exception(f"Error parsing FB2 file: {str(e)}")
+        tree = ET.parse(self.file_path)
+        root = tree.getroot()
 
-        # Extract title
-        title = root.find(".//book-title")
-        title = title.text if title is not None else "Title not found"
+        title_info = root.find('fb2:description/fb2:title-info', self.ns)
+        title = "Название не найдено"
+        authors_str = "Автор не указан"
+        annotation = "Аннотация отсутствует"
 
-        # Extract authors
-        authors = root.findall(".//author")
-        author_names = []
-        for author in authors:
-            first_name = author.find("first-name")
-            last_name = author.find("last-name")
-            name = f"{first_name.text if first_name is not None else ''} {last_name.text if last_name is not None else ''}".strip()
-            if name:
-                author_names.append(name)
-        authors = ", ".join(author_names) if author_names else "Author not specified"
+        if title_info is not None:
+            t = title_info.find('fb2:book-title', self.ns)
+            if t is not None and t.text:
+                title = t.text.strip()
 
-        # Extract annotation
-        annotation = root.find(".//annotation")
-        if annotation is not None:
-            annotation_text = "\n".join([p.text.strip() for p in annotation.findall("p") if p.text])
-        else:
-            annotation_text = "Annotation not available"
+            authors = title_info.findall('fb2:author', self.ns)
+            if authors:
+                authors_list = []
+                for a in authors:
+                    first_name = a.find('fb2:first-name', self.ns)
+                    last_name = a.find('fb2:last-name', self.ns)
+                    fn = first_name.text.strip() if first_name is not None and first_name.text else ""
+                    ln = last_name.text.strip() if last_name is not None and last_name.text else ""
+                    full_name = f"{fn} {ln}".strip()
+                    if full_name:
+                        authors_list.append(full_name)
+                if authors_list:
+                    authors_str = ", ".join(authors_list)
 
-        # Extract content
+            ann = title_info.find('fb2:annotation', self.ns)
+            if ann is not None:
+                ann_paragraphs = []
+                for p in ann.findall('fb2:p', self.ns):
+                    if p.text:
+                        ann_paragraphs.append(p.text.strip())
+                if ann_paragraphs:
+                    annotation = "\n".join(ann_paragraphs)
+
         content_builder = []
+        body = root.find('fb2:body', self.ns)
+        if body is not None:
+            for title_elem in body.findall('fb2:title', self.ns):
+                for p in title_elem.findall('fb2:p', self.ns):
+                    if p.text:
+                        content_builder.append(p.text.strip())
+                content_builder.append("")
 
-        # Process titles from <body>
-        for title in root.findall(".//body/title"):
-            for p in title.findall("p"):
-                if p.text:
-                    content_builder.append(p.text.strip())
+            for section in body.findall('fb2:section', self.ns):
+                section_text = self.extractAllTextFromSection(section)
+                if section_text.strip():
+                    content_builder.append(section_text.strip())
+                    content_builder.append("")
 
-        # Process sections
-        for section in root.findall(".//body/section"):
-            content_builder.append(self.extract_all_text_from_section(section))
+        content_str = "\n\n".join([c for c in content_builder if c.strip()])
+        if not content_str:
+            content_str = "Содержание отсутствует"
 
-        content = "\n\n".join(content_builder).strip() if content_builder else "Content not available"
+        return BookText(
+            title=title,
+            authors=authors_str,
+            content=content_str,
+            annotation=annotation
+        )
 
-        return BookText(title, authors, content, annotation_text)
+    def extractAllTextFromSection(self, section):
+        texts = []
+        # Используем неймспейс
+        titles = section.findall('fb2:title', self.ns)
+        for title_elem in titles:
+            title_pars = [p.text.strip() for p in title_elem.findall('fb2:p', self.ns) if p.text and p.text.strip()]
+            if title_pars:
+                texts.append("### " + " ".join(title_pars) + " ###")
 
-    def extract_all_text_from_section(self, section: ET.Element) -> str:
-        section_content = []
+        pars = [p.text.strip() for p in section.findall('fb2:p', self.ns) if p.text and p.text.strip()]
+        if pars:
+            texts.append("\n".join(pars))
 
-        # Extract titles
-        titles = section.findall("title")
-        if titles:
-            title_text = "\n".join([p.text.strip() for title in titles for p in title.findall("p") if p.text])
-            if title_text:
-                section_content.append(f"### {title_text} ###")
+        nested_sections = section.findall('fb2:section', self.ns)
+        for nested_section in nested_sections:
+            nested_text = self.extractAllTextFromSection(nested_section)
+            if nested_text.strip():
+                texts.append(nested_text.strip())
 
-        # Extract paragraphs
-        paragraphs = [p.text.strip() for p in section.findall("p") if p.text]
-        if paragraphs:
-            section_content.append("\n".join(paragraphs))
-
-        # Process nested sections
-        for nested_section in section.findall("section"):
-            section_content.append(self.extract_all_text_from_section(nested_section))
-
-        return "\n\n".join(section_content)
-
+        return "\n\n".join(texts)

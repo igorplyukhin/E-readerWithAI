@@ -1,9 +1,7 @@
 from typing import Literal, Optional
-from click import prompt
 from fastapi import UploadFile
 from fastapi.responses import JSONResponse
 import requests
-import json
 import uuid
 from PyPDF2 import PdfReader
 import io
@@ -83,7 +81,8 @@ async def choice_action(file: UploadFile, action: Literal['compress', 'tests'], 
               f"Исходный текст: \n{blocks}"
           ) """
         result = send_to_gigachat(prompt, "5", temperature, top_p)
-        return result
+        print(result)
+        return {"number_of_chunks": len(blocks), "compress_text": result}
 
     
 

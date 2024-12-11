@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from typing import Optional
+from pydantic import BaseModel
 
-@dataclass
-class BookText:
+class BookText(BaseModel):
     title: str
     authors: str
     content: str

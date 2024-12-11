@@ -1,7 +1,7 @@
-from dataclasses import dataclass
 from typing import List
+from pydantic import BaseModel
+from models.Book import Book 
 
-@dataclass
-class UserBooksResponse:
+class UserBooksResponse(BaseModel):
     count_book: int
-    books: List['Book'] 
+    books: List[Book]

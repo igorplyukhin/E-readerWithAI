@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 from typing import Optional
+from pydantic import BaseModel
+from models.Book import Book  
 
-@dataclass
-class BookResponse:
+class BookResponse(BaseModel):
     status: str
     message: str
-    book: Optional['Book'] = None
+    book: Optional[Book] = None

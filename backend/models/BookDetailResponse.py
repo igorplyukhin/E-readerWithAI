@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from typing import List
+from pydantic import BaseModel
 
-@dataclass
-class BookDetailResponse:
+class BookDetailResponse(BaseModel):
     annotation: str
     totalPages: int
     textBlocks: List[str]

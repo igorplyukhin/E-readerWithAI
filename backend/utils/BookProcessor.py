@@ -1,116 +1,111 @@
-import os
 import re
-from typing import List
-
-from pdfminer.high_level import extract_text
-from bson.objectid import ObjectId
-
-class BookText:
-    def __init__(self, title, authors, content, annotation=None):
-        self.title = title
-        self.authors = authors
-        self.content = content
-        self.annotation = annotation
-
-class Book:
-    def __init__(self, idBook, title, author, description, annotation, status, mode, nameFile, filePath):
-        self.idBook = idBook
-        self.title = title
-        self.author = author
-        self.description = description
-        self.annotation = annotation
-        self.status = status
-        self.mode = mode
-        self.nameFile = nameFile
-        self.filePath = filePath
-
-class TextBlock:
-    def __init__(self, _id, original, numberChapter):
-        self._id = _id
-        self.original = original
-        self.numberChapter = numberChapter
-
+from typing import List, Optional
+from bson import ObjectId
+from PyPDF2 import PdfReader
+from models.BookText import BookText
+from models.Book import Book
+from models.TextBlock import TextBlock
+from utils.Fb2Processor import Fb2Processor  # Предполагается, что вы уже адаптировали Fb2Processor
 
 class BookProcessor:
-    def __init__(self, filePath: str, nameFile: str):
-        self.filePath = filePath
-        self.nameFile = nameFile
+    def __init__(self, file_path: str, name_file: str):
+        self.file_path = file_path
+        self.name_file = name_file
 
-    def readTextFile(self) -> str:
-        with open(self.filePath, 'r', encoding='utf-8') as f:
+    def read_text_file(self) -> str:
+        with open(self.file_path, 'r', encoding='utf-8', errors='ignore') as f:
             return f.read()
 
-    def readPdfFile(self) -> str:
-        return extract_text(self.filePath)
+    def read_pdf_file(self) -> str:
+        text_content = []
+        with open(self.file_path, 'rb') as f:
+            reader = PdfReader(f)
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text_content.append(page_text)
+        return "\n".join(text_content)
 
+    def read_fb2_file(self) -> BookText:
+        fb2_processor = Fb2Processor(self.file_path)
+        return fb2_processor.extract_book_text()
 
-    def readFb2File(self) -> BookText:  # Requires Fb2Processor implementation (not provided)
-        # Placeholder, replace with actual FB2 parsing logic
-        raise NotImplementedError("FB2 parsing not implemented")
-
-
-    def getChapters(self, fileType: str) -> List[str]:
-        content = ""
-        if fileType == "text/plain":
-            content = self.readTextFile()
-        elif fileType == "application/pdf":
-            content = self.readPdfFile()
-        elif fileType == "application/fb2+xml":
-            content = self.readFb2File().content
+    def get_chapters(self, file_type: str) -> List[str]:
+        if file_type == "text/plain":
+            content = self.read_text_file()
+        elif file_type == "application/pdf":
+            content = self.read_pdf_file()
+        elif file_type == "application/fb2+xml":
+            content = self.read_fb2_file().content
         else:
             raise ValueError("Unsupported file type")
-        return [c.strip() for c in re.split(r"(Глава|Часть)\s+\d+", content, flags=re.IGNORECASE) if c.strip()]
 
-    def extractLineContent(self, content: str, prefix: str) -> str:
-        match = re.search(rf"(?i){prefix}\s*(.*)", content)
-        return match.group(1).strip() if match else None
+        # Разделяем на главы по шаблону "(Глава|Часть)\s+\d+"
+        chapters = re.split(r"(Глава|Часть)\s+\d+", content, flags=re.IGNORECASE)
+        # Фильтруем пустые строки и пробелы
+        chapters = [ch.strip() for ch in chapters if ch.strip()]
+        return chapters
 
-    def getBook(self, fileType: str) -> Book:
-        bookText = None
-        if fileType == "text/plain":
-            content = self.readTextFile()
-            bookText = BookText(
-                title=self.extractLineContent(content, "Title:") or "Название не указано",
-                authors=self.extractLineContent(content, "Author(s):") or "Автор книги не указан",
-                content=self.extractLineContent(content, "Content:") or "Описание отсутствует",
+    def get_book(self, file_type: str) -> Book:
+        if file_type == "text/plain":
+            content = self.read_text_file()
+            book_text = BookText(
+                title=self.extract_line_content(content, "Title:") or "Название не указано",
+                authors=self.extract_line_content(content, "Author(s):") or "Автор книги не указан",
+                content=self.extract_line_content(content, "Content:") or "Описание отсутствует",
+                annotation=None
             )
-        elif fileType == "application/pdf":
-            text = self.readPdfFile()
-            bookText = BookText(
+        elif file_type == "application/pdf":
+            text = self.read_pdf_file()
+            book_text = BookText(
                 title="Неизвестно",
                 authors="Неизвестно",
                 content=text,
+                annotation=None
             )
-        elif fileType == "application/fb2+xml":
-            bookText = self.readFb2File()
+        elif file_type == "application/fb2+xml":
+            book_text = self.read_fb2_file()
         else:
             raise ValueError("Unsupported file type")
 
-        idBook = str(ObjectId())
+        id_book = str(ObjectId())
         return Book(
-            idBook=idBook,
-            title=bookText.title,
-            author=bookText.authors,
-            description=bookText.content,
-            annotation=bookText.annotation,
+            idBook=id_book,
+            title=book_text.title,
+            author=book_text.authors,
+            description=book_text.content,
+            annotation=book_text.annotation,
             status="reading",
             mode="default",
-            nameFile=self.nameFile,
-            filePath=self.filePath,
+            nameFile=self.name_file,
+            filePath=self.file_path
         )
 
-    def divideChapterIntoBlocks(self, chapter: str) -> List[str]:
-        blockSize = 1000
-        return [chapter[i:i + blockSize] for i in range(0, len(chapter), blockSize)]
+    def extract_line_content(self, content: str, prefix: str) -> Optional[str]:
+        pattern = re.compile(prefix + r"\s*(.*)", re.IGNORECASE)
+        match = pattern.search(content)
+        if match:
+            return match.group(1).strip()
+        return None
 
-    def processChaptersAndBlocks(self, chapters: List[str]) -> List[TextBlock]:
-        textBlocks = []
-        for i, chapter in enumerate(chapters):
-            blocks = self.divideChapterIntoBlocks(chapter)
-            for block in blocks:
-                textBlocks.append(TextBlock(
+    def divide_chapter_into_blocks(self, chapter: str, block_size: int = 1000) -> List[str]:
+        blocks = []
+        start_index = 0
+        while start_index < len(chapter):
+            end_index = min(start_index + block_size, len(chapter))
+            blocks.append(chapter[start_index:end_index])
+            start_index = end_index
+        return blocks
+
+    def process_chapters_and_blocks(self, chapters: List[str]) -> List[TextBlock]:
+        text_blocks = []
+        for chapter_index, chapter_content in enumerate(chapters):
+            blocks = self.divide_chapter_into_blocks(chapter_content)
+            for block_content in blocks:
+                text_block = TextBlock(
                     _id=str(ObjectId()),
-                    original=block,
-                    numberChapter=i + 1
-                ))
-        return textBlocks
+                    original=block_content,
+                    numberChapter=chapter_index + 1
+                )
+                text_blocks.append(text_block)
+        return text_blocks

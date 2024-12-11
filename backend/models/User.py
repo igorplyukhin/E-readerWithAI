@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
 from typing import List
+from pydantic import BaseModel, Field
 
-@dataclass
-class User:
+class User(BaseModel):
     idUser: str
     password: str = ""
-    bookIds: List[str] = field(default_factory=list)
+    bookIds: List[str] = Field(default_factory=list)
     countBook: int = 0
