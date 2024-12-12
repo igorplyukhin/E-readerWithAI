@@ -1,24 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_book"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@drawable/book_item_background">
 
-    <!-- TextView для отображения названия книги -->
+    <!-- Обложка книги -->
+    <ImageView
+        android:id="@+id/ivBookCover"
+        android:layout_width="80dp"
+        android:layout_height="120dp"
+        android:src="@drawable/sample_book_cover"
+        android:contentDescription="@string/book_cover"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/rounded_corners"/>
+
+    <!-- Название книги -->
     <TextView
         android:id="@+id/tvBookTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="10dp"
-        android:text="Название книги"
-        android:textColor="@color/black"
+        android:text="Война и мир"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintStart_toEndOf="@id/ivBookCover"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginStart="8dp" />
+
+    <!-- Автор книги -->
+    <TextView
+        android:id="@+id/tvBookAuthor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Л.Н. Толстой"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
+        app:layout_constraintStart_toStartOf="@id/tvBookTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Аннотация -->
+    <TextView
+        android:id="@+id/tvBookAnnotation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Роман-эпопея о войне и мире в Российской Империи..."
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
+        app:layout_constraintStart_toStartOf="@id/tvBookTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="4dp" />
+
+    <!-- Прогресс чтения -->
+    <ProgressBar
+        android:id="@+id/pbReadingProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="10dp"
+        android:progress="50"
+        android:progressDrawable="@drawable/progress_bar"
+        app:layout_constraintTop_toBottomOf="@id/tvBookAnnotation"
+        app:layout_constraintStart_toStartOf="@id/tvBookTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
