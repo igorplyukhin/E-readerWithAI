@@ -136,7 +136,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="16dp"
-        android:background="#000000">
+        android:background="@color/read_background_color">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -170,7 +170,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Развернуть"
-                android:background="@null"
+                android:background="@color/read_background_color"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp" />
@@ -202,7 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Развернуть"
-                android:background="@null"
+                android:background="@color/read_background_color"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp" />

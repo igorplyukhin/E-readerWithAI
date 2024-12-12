@@ -7,7 +7,8 @@
 
     <!-- Основные цвета -->
     <color name="book_background_color">#8A5A2E</color> <!-- Фон заголовка (коричневый) -->
-    <color name="bottom_nav_background">#000000</color> <!-- Фон нижней навигации (чёрный) -->
+    <color name="read_background_color">#101317</color> <!-- Фон заголовка (коричневый) -->
+    <color name="bottom_nav_background">#101317</color> <!-- Фон нижней навигации (чёрный) -->
 
     <!-- Текст -->
     <color name="text_primary">#000000</color> <!-- Основной текст (белый) -->
