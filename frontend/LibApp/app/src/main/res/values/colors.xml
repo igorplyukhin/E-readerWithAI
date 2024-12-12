@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Основные цвета -->
+    <color name="book_background_color">#8A5A2E</color> <!-- Фон заголовка (коричневый) -->
+    <color name="bottom_nav_background">#000000</color> <!-- Фон нижней навигации (чёрный) -->
+
+    <!-- Текст -->
+    <color name="text_primary">#000000</color> <!-- Основной текст (белый) -->
+    <color name="text_secondary">#D6D6D6</color> <!-- Вторичный текст (светло-серый) -->
+
+    <!-- Кнопки -->
+    <color name="button_primary">#FFFFFFFF</color> <!-- Фон основной кнопки -->
+    <color name="button_secondary">#424242</color> <!-- Фон вторичной кнопки -->
+
+    <!-- Прогресс бар -->
+    <color name="progress_bar_background">#D6D6D6</color> <!-- Цвет фона прогресс-бара -->
+    <color name="progress_bar_foreground">#FFD700</color> <!-- Цвет заполненной части прогресс-бара -->
 </resources>

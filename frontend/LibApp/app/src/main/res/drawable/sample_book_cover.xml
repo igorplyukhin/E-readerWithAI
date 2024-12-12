@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Фон обложки -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="45"
+                android:startColor="#FFCC80"/> <!-- Верхний левый цвет -->
+            android:endColor="#FF7043" <!-- Нижний правый цвет -->
+            android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Пример контуров или рамки -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="2dp"
+                android:color="#000000" />
+        </shape>
+    </item>
+</layer-list>

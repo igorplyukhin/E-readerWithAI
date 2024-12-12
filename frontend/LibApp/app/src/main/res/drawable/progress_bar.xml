@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Задний план прогресс-бара (фон) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" /> <!-- Закругленные углы -->
+            <solid android:color="@color/progress_bar_background" /> <!-- Цвет фона -->
+        </shape>
+    </item>
+
+    <!-- Передний план прогресс-бара (заполненная часть) -->
+    <item>
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="8dp" /> <!-- Закругленные углы -->
+                <solid android:color="@color/progress_bar_foreground" /> <!-- Цвет прогресса -->
+            </shape>
+        </clip>
+    </item>
+</layer-list>

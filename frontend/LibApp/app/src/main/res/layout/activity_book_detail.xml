@@ -2,22 +2,222 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/book_background_color"
     tools:context=".BookDetailActivity">
 
-    <!-- TextView for displaying the content of the book -->
+    <!-- Кнопка назад -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="45dp"
+        android:layout_height="47dp"
+        android:background="@null"
+        android:src="@drawable/ic_back"
+        app:layout_constraintMarginStart="16dp"
+        app:layout_constraintMarginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Обложка книги -->
+    <ImageView
+        android:id="@+id/ivBookCover"
+        android:layout_width="120dp"
+        android:layout_height="180dp"
+        android:contentDescription="@string/book_cover"
+        android:src="@drawable/book"
+        android:background="@drawable/rounded_corners"
+        android:scaleType="centerCrop"
+        android:clipToOutline="true"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="16dp" />
+
+
+    <!-- Название книги -->
     <TextView
-        android:id="@+id/tvBookContent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="16dp"
+        android:id="@+id/tvBookTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Война и мир"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/ivBookCover"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="8dp" />
+
+    <!-- Автор книги -->
+    <TextView
+        android:id="@+id/tvBookAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Л.Н. Толстой"
+        android:textColor="@android:color/white"
         android:textSize="16sp"
-        android:gravity="top|start"
-        android:scrollbars="vertical"
-        tools:text="Sample book content goes here..."
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="4dp" />
+
+    <!-- Прогресс чтения -->
+    <ProgressBar
+        android:id="@+id/pbReadingProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:progress="56"
+        android:progressDrawable="@drawable/progress_bar"
+        app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="16dp" />
+
+    <!-- Текст прогресса -->
+    <TextView
+        android:id="@+id/tvReadingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="56%     4 ч. 37 мин."
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/pbReadingProgress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="8dp" />
+
+    <!-- Кнопки действия -->
+    <LinearLayout
+        android:id="@+id/llActionButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvReadingProgress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintMarginTop="24dp">
+
+        <Button
+            android:id="@+id/btnReadBook"
+            style="@null"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_read_book_background"
+            android:padding="12dp"
+            android:text="Читать книгу"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnCompressText"
+            style="@null"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_compress_book_background"
+            android:padding="12dp"
+            android:text="Сжать книгу"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Текст описания -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/llActionButtons"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp"
+        android:background="#000000">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- Заголовок Аннотация -->
+            <TextView
+                android:id="@+id/tvAnnotationHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Аннотация:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Текст Аннотации -->
+            <TextView
+                android:id="@+id/tvAnnotationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="«Война и мир» — роман-эпопея Льва Николаевича Толстого..."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp" />
+
+            <!-- Кнопка Развернуть -->
+            <Button
+                android:id="@+id/btnExpandAnnotation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Развернуть"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+            <!-- Заголовок Об Авторе -->
+            <TextView
+                android:id="@+id/tvAboutAuthorHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Об авторе:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
+            <!-- Текст Об Авторе -->
+            <TextView
+                android:id="@+id/tvAboutAuthorText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Граф Лев Николаевич Толстой — один из наиболее известных русских писателей..."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp" />
+
+            <!-- Кнопка Развернуть -->
+            <Button
+                android:id="@+id/btnExpandAboutAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Развернуть"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Нижняя панель -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bottom_nav_background"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
