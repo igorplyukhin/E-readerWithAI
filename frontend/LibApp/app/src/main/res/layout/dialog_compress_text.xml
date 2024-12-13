@@ -29,8 +29,7 @@
         app:trackColorActive="@color/black"
         app:trackColorInactive="@color/dark_gray"
         app:thumbColor="@color/black"
-        app:haloColor="@color/gray"
-        app:ticksColor="@color/black" />
+        app:haloColor="@color/gray"/>
 
     <!-- Текст для отображения значения -->
     <TextView

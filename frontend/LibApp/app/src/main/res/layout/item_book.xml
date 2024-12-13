@@ -31,8 +31,7 @@
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivBookCover"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginStart="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Автор книги -->
     <TextView
@@ -56,8 +55,7 @@
         android:textSize="12sp"
         app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
         app:layout_constraintStart_toStartOf="@id/tvBookTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="4dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Прогресс чтения -->
     <ProgressBar
@@ -69,7 +67,6 @@
         android:progressDrawable="@drawable/progress_bar"
         app:layout_constraintTop_toBottomOf="@id/tvBookAnnotation"
         app:layout_constraintStart_toStartOf="@id/tvBookTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

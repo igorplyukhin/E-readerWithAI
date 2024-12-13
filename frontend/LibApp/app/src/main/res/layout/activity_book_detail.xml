@@ -14,8 +14,6 @@
         android:layout_height="47dp"
         android:background="@null"
         android:src="@drawable/ic_back"
-        app:layout_constraintMarginStart="16dp"
-        app:layout_constraintMarginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,8 +29,7 @@
         android:clipToOutline="true"
         app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
     <!-- Название книги -->
@@ -46,8 +43,7 @@
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/ivBookCover"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Автор книги -->
     <TextView
@@ -59,8 +55,7 @@
         android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="4dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Прогресс чтения -->
     <ProgressBar
@@ -72,8 +67,7 @@
         android:progressDrawable="@drawable/progress_bar"
         app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Текст прогресса -->
     <TextView
@@ -85,8 +79,7 @@
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@id/pbReadingProgress"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Кнопки действия -->
     <LinearLayout
@@ -98,8 +91,7 @@
         android:paddingEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/tvReadingProgress"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="24dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/btnReadBook"
