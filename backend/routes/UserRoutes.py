@@ -1,124 +1,70 @@
-from fastapi import APIRouter, HTTPException, Form
+from fastapi import APIRouter, Form, Query
 from fastapi.responses import JSONResponse
-from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
-from models.UserBooksResponse import UserBooksResponse
-from models.User import User
-from models.Book import Book
+from Services.UserService import UserService
 
 user_router = APIRouter()
+user_service = UserService()
 
-client = AsyncIOMotorClient("mongodb://localhost:27017/")
-db = client["database"]
-users_collection = db["users"]
-books_collection = db["books"]
+@user_router.get("/api/user/get", summary="Получить данные пользователя", description="",
+                      tags=["Пользователи"])
+async def get_user(
+    login: str = Query(..., description="Имя пользователя")):
 
-@user_router.post("/get_user")
-async def get_user(login: str = Form(...)):
     if not login:
-        raise HTTPException(status_code=400, detail="Логин не предоставлен")
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин не предоставлен"})
+    
+    response = await user_service.get_user(login)
+    return JSONResponse(status_code=200, content=response.model_dump())
 
-    user_doc = await users_collection.find_one({"_id": login})
-    if user_doc is None:
-        raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-    user = User(
-        idUser=user_doc["_id"],
-        password=user_doc.get("password", ""),
-        bookIds=user_doc.get("bookIds", []),
-        countBook=user_doc.get("countBook", 0)
-    )
-
-    if user.bookIds:
-        object_id_list = [ObjectId(bid) for bid in user.bookIds]
-        book_docs = await books_collection.find({"_id": {"$in": object_id_list}}).to_list(length=None)
-
-        books = []
-        for doc in book_docs:
-            book = Book(
-                idBook=str(doc["_id"]),
-                title=doc.get("title", "Без названия"),
-                author=doc.get("author", "Неизвестно"),
-                description=doc.get("description", ""),
-                annotation=doc.get("annotation"),
-                status=doc.get("status", "reading"),
-                mode=doc.get("mode", "default"),
-                nameFile=doc.get("nameFile", ""),
-                filePath=doc.get("filePath", ""),
-                blockStopBook=doc.get("blockStopBook", 0),
-                chapterStopBook=doc.get("chapterStopBook", 0),
-                textBlockIds=doc.get("textBlockIds", [])
-            )
-            books.append(book)
-
-        response = UserBooksResponse(
-            count_book=len(books),
-            books=books
-        )
-        return JSONResponse(status_code=200, content=response.model_dump())
-    else:
-        return JSONResponse(status_code=200, content=UserBooksResponse(count_book=0, books=[]).model_dump())
-
-@user_router.post("/register")
-async def register(login: str = Form(...), password: str = Form(...)):
+@user_router.post("/api/user/register", summary="Зарегистрировать нового пользователя", description="",
+                      tags=["Пользователи"])
+async def register(
+    login: str = Query(..., description="Имя пользователя"), 
+    password: str = Query(..., description="Пароль")):
+    
     if not login or not password:
-        raise HTTPException(status_code=400, detail="Логин или пароль не предоставлены")
-
-    existing_user = await users_collection.find_one({"_id": login})
-
-    if existing_user:
-        raise HTTPException(status_code=409, detail="Пользователь с таким логином уже существует")
-
-    new_user = {"_id": login, "password": password}
-    await users_collection.insert_one(new_user)
-
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин или пароль не предоставлены"})
+    
+    await user_service.register_user(login, password)
     return JSONResponse(content={"status": "success", "message": "Пользователь успешно зарегистрирован", "userId": login})
 
-@user_router.post("/login")
-async def login(login: str = Form(...), password: str = Form(...)):
+
+@user_router.post("/api/user/login", summary="Залогиниться в приложении", description="",
+                      tags=["Пользователи"])
+async def login(
+    login: str = Query(..., description="Имя пользователя"), 
+    password: str = Query(..., description="Пароль")):
+    
     if not login or not password:
-        raise HTTPException(status_code=400, detail="Логин или пароль не предоставлены")
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин или пароль не предоставлены"})
+    
+    response = await user_service.login_user(login, password)
+    return JSONResponse(content=response)
 
-    user_doc = await users_collection.find_one({"_id": login})
 
-    if user_doc and user_doc.get("password") == password:
-        return JSONResponse(content={"status": "success", "message": "Аутентификация успешна", "userId": login})
-    else:
-        raise HTTPException(status_code=401, detail="Неверный пароль или пользователь не найден")
-
-# Изменение пароля пользователя / После реализации на фронте убрать этот комментарий 
-@user_router.post("/update_user")
-async def update_user(login: str = Form(...), new_password: str = Form(...), old_password: str = Form(...)):
+@user_router.patch("/api/user/update", summary="Обновить данные пользователя", description="",
+                      tags=["Пользователи"])
+async def update_user(
+    login: str = Query(..., description="Имя пользователя"), 
+    old_password: str = Query(..., description="Старый пароль"),
+    new_password: str = Query(..., description="Новый пароль")):
+    
     if not login or not new_password or not old_password:
-        raise HTTPException(status_code=400, detail="Не предоставлены необходимые параметры")
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Не предоставлены необходимые параметры"})
+    
+    response = await user_service.update_user_password(login, new_password, old_password)
+    return JSONResponse(content=response)
 
-    user_doc = await users_collection.find_one({"_id": login})
 
-    if user_doc and user_doc.get("password") == old_password:
-        result = await users_collection.update_one(
-            {"_id": login},
-            {"$set": {"password": new_password}}
-        )
-        if result.modified_count > 0:
-            return JSONResponse(content={"message": "Пароль успешно обновлен"})
-        else:
-            raise HTTPException(status_code=500, detail="Не удалось обновить пароль")
-    else:
-        raise HTTPException(status_code=401, detail="Старый пароль неверен или пользователь не найден")
-
-# Удаления аккаунта пользователя / После реализации на фронте убрать этот комментарий 
-@user_router.post("/delete_user")
-async def delete_user(login: str = Form(...), password: str = Form(...)):
+@user_router.delete("/api/user/delete", summary="Удалить пользователя", description="",
+                      tags=["Пользователи"])
+async def delete_user(
+    login: str = Query(..., description="Имя пользователя"), 
+    password: str = Query(..., description="Пароль")):
+    
     if not login or not password:
-        raise HTTPException(status_code=400, detail="Логин или пароль не предоставлен")
-
-    user_doc = await users_collection.find_one({"_id": login})
-
-    if user_doc and user_doc.get("password") == password:
-        result = await users_collection.delete_one({"_id": login})
-        if result.deleted_count > 0:
-            return JSONResponse(content={"message": "Пользователь успешно удален"})
-        else:
-            raise HTTPException(status_code=500, detail="Не удалось удалить пользователя")
-    else:
-        raise HTTPException(status_code=401, detail="Неверный пароль или пользователь не найден")
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин или пароль не предоставлены"})
+    
+    response = await user_service.delete_user(login, password)
+    return JSONResponse(content=response)

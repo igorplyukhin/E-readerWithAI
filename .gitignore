@@ -130,6 +130,7 @@ venv.bak/
 *.sqlite3
 *.db
 *.json
+!appsettings.json
 
 # Папки для кэша
 .cache/
@@ -151,7 +152,11 @@ coverage.xml
 .ipynb_checkpoints
 
 #Прочие файлы
+appsettings.Development.json
 *.pdf
 *.txt
 *.fb2
 !requirements.txt
+backend/SberMobile/
+*/venv/
+*/env/
