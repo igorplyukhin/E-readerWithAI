@@ -1,24 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="dark_gray">#808080</color>
-    <color name="gray">#B0B0B0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#101317</color>
+    <color name="dark_gray">#333333</color>
 
-    <!-- Основные цвета -->
-    <color name="book_background_color">#8A5A2E</color> <!-- Фон заголовка (коричневый) -->
-    <color name="read_background_color">#101317</color> <!-- Фон заголовка (коричневый) -->
-    <color name="bottom_nav_background">#101317</color> <!-- Фон нижней навигации (чёрный) -->
-
-    <!-- Текст -->
-    <color name="text_primary">#000000</color> <!-- Основной текст (белый) -->
-    <color name="text_secondary">#D6D6D6</color> <!-- Вторичный текст (светло-серый) -->
-
-    <!-- Кнопки -->
-    <color name="button_primary">#FFFFFFFF</color> <!-- Фон основной кнопки -->
-    <color name="button_secondary">#424242</color> <!-- Фон вторичной кнопки -->
-
-    <!-- Прогресс бар -->
-    <color name="progress_bar_background">#D6D6D6</color> <!-- Цвет фона прогресс-бара -->
-    <color name="progress_bar_foreground">#FFD700</color> <!-- Цвет заполненной части прогресс-бара -->
 </resources>
