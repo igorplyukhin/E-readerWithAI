@@ -1,24 +1,118 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_book"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- TextView для отображения названия книги -->
+    <!-- Изображение обложки книги -->
+    <ImageView
+            android:id="@+id/imgBookCover"
+            android:layout_width="85dp"
+            android:layout_height="100dp"
+            android:src="@drawable/book_placeholder"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Название книги -->
     <TextView
-        android:id="@+id/tvBookTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="10dp"
-        android:text="Название книги"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+            android:id="@+id/tvBookTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Название книги"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/imgBookCover"
+            app:layout_constraintTop_toTopOf="@+id/imgBookCover"
+            android:fontFamily="@font/montserrat_medium"
+            android:layout_marginStart="16dp"
+            android:textColor="#FFFFFF" />
 
+    <!-- Автор книги -->
+
+    <!-- Прогресс чтения -->
+
+    <TextView
+            android:id="@+id/tvBookAuthor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Автор книги"
+            android:textSize="10sp"
+            app:layout_constraintStart_toEndOf="@+id/tvBookTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp"
+            android:textColor="#A39F9F"
+            android:fontFamily="@font/montserrat_light"
+            app:layout_constraintTop_toTopOf="@+id/tvBookTitle"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBookTitle"
+            android:layout_marginEnd="16dp" />
+
+    <ProgressBar
+            android:id="@+id/progressReading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:progress="50"
+            app:layout_constraintStart_toEndOf="@id/imgBookCover"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tvReadingProgress"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="4dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:layout_marginEnd="16dp" />
+
+    <!-- Текст прогресса чтения -->
+    <TextView
+            android:id="@+id/tvReadingProgress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="50%"
+            android:textSize="10sp"
+            app:layout_constraintStart_toEndOf="@id/imgBookCover"
+            app:layout_constraintBottom_toBottomOf="@+id/imgBookCover"
+            android:layout_marginStart="16dp"
+            android:textColor="#A39F9F"
+            android:fontFamily="@font/montserrat_light" />
+
+    <TextView
+            android:id="@+id/tvReadingStatus"
+            android:text="4 час 37 мин "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvReadingProgress"
+            app:layout_constraintTop_toTopOf="@+id/tvReadingProgress"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="#A39F9F"
+            android:fontFamily="@font/montserrat_light"
+            android:layout_marginEnd="16dp" />
+
+    <TextView
+            android:id="@+id/tvDescription"
+            android:text="«Война́ и мир» — роман-эпопея Льва Николаевича Толстого, описывающий р… (заглушка)"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#A39F9F"
+            app:layout_constraintTop_toBottomOf="@+id/tvBookTitle"
+            app:layout_constraintBottom_toTopOf="@+id/progressReading"
+            app:layout_constraintStart_toEndOf="@+id/imgBookCover"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:fontFamily="@font/montserrat_light"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginEnd="16dp" />
+
+    <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#A39F9F"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgBookCover"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,4 +8,6 @@ data class Book(
     val annotation: String?,
     val nameFile: String,
     val filePath: String,
+    val progress: Int,
+    val status: String
 )

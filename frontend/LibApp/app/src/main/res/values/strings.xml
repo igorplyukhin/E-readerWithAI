@@ -1,3 +1,24 @@
 <resources>
+    <!-- Общее -->
     <string name="app_name">LibApp</string>
+
+    <!-- Тексты для меню BottomNavigationView -->
+    <string name="menu_books">Книги</string>
+    <string name="menu_search">Поиск</string>
+    <string name="menu_chat">Чат</string>
+    <string name="menu_profile">Профиль</string>
+
+    <!-- Прочие тексты -->
+    <string name="tab_all">Все</string>
+    <string name="tab_favorites">Избранное</string>
+
+    <!-- Ошибки и уведомления -->
+    <string name="error_empty_fields">Пожалуйста, заполните все поля</string>
+    <string name="error_login_failed">Ошибка входа</string>
+    <string name="success_login">Успешный вход</string>
+    <string name="success_registration">Регистрация прошла успешно</string>
+
+    <!-- Действия -->
+    <string name="action_login">Войти</string>
+    <string name="action_register">Регистрация</string>
 </resources>

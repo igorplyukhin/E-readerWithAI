@@ -1,9 +1,26 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.LibApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.LibApp" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Основной шрифт приложения -->
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <!-- Стиль текста для BottomNavigationView -->
+        <item name="bottomNavigationStyle">@style/BottomNavigationStyle</item>
     </style>
 
-    <style name="Theme.LibApp" parent="Base.Theme.LibApp" />
+    <style name="BottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemTextAppearanceActive">@style/BottomNavText</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavText</item>
+    </style>
+
+    <style name="BottomNavText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+
+
+
+
+
 </resources>
