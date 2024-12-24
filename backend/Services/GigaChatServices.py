@@ -65,7 +65,7 @@ async def choice_action(file: Optional[UploadFile], action: Literal['compress', 
           )
         result = send_to_gigachat(prompt, "5", temperature, top_p)
         print(result)
-        return {"number_of_chunks": len(blocks), "compress_text": result}
+        return result
     
     elif action == 'dialog':
         if prompt == None or prompt == "":
