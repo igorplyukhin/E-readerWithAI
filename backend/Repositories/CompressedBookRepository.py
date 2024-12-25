@@ -4,7 +4,11 @@ from bson import ObjectId
 from datetime import datetime
 import logging
 
+<<<<<<< HEAD
 from utils.ReadSettings import get_setting
+=======
+from Utils.ReadSettings import get_setting
+>>>>>>> origin/backend_python
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

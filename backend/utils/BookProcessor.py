@@ -5,10 +5,14 @@ from PyPDF2 import PdfReader
 from models.BookText import BookText
 from models.Book import Book
 from models.TextBlock import TextBlock
+<<<<<<< HEAD
 from utils.Fb2Processor import (
     Fb2Processor,
 )  # Предполагается, что вы уже адаптировали Fb2Processor
 
+=======
+from Utils.Fb2Processor import Fb2Processor  # Предполагается, что вы уже адаптировали Fb2Processor
+>>>>>>> origin/backend_python
 
 class BookProcessor:
     def __init__(self, file_path: str, name_file: str):

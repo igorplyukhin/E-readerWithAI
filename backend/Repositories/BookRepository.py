@@ -3,8 +3,12 @@ from bson import ObjectId
 from fastapi import HTTPException
 from models.Book import Book
 from models.TextBlock import TextBlock
+<<<<<<< HEAD
 from utils.ReadSettings import get_setting
 
+=======
+from Utils.ReadSettings import get_setting
+>>>>>>> origin/backend_python
 
 class BookRepository:
     def __init__(self):
@@ -24,13 +28,22 @@ class BookRepository:
 
     async def update_book_text_block_ids(self, book_id, text_block_ids):
         await self.books_collection.update_one(
+<<<<<<< HEAD
             {"_id": ObjectId(book_id)}, {"$set": {"textBlockIds": text_block_ids}}
+=======
+            {"_id": ObjectId(book_id)},
+            {"$set": {"textBlockIds": text_block_ids}}
+>>>>>>> origin/backend_python
         )
 
     async def update_user_books(self, user_id, book_id):
         await self.users_collection.update_one(
             {"_id": user_id},
+<<<<<<< HEAD
             {"$addToSet": {"bookIds": book_id}, "$inc": {"countBook": 1}},
+=======
+            {"$addToSet": {"bookIds": book_id}, "$inc": {"countBook": 1}}
+>>>>>>> origin/backend_python
         )
 
     async def get_book_by_id(self, book_id):
@@ -39,13 +52,18 @@ class BookRepository:
 
     async def get_text_blocks_by_ids(self, text_block_ids):
         object_id_list = [ObjectId(tid) for tid in text_block_ids]
+<<<<<<< HEAD
         return await self.text_blocks_collection.find(
             {"_id": {"$in": object_id_list}}
         ).to_list(length=None)
+=======
+        return await self.text_blocks_collection.find({"_id": {"$in": object_id_list}}).to_list(length=None)
+>>>>>>> origin/backend_python
 
     async def get_text_block_by_id(self, text_block_id):
         object_id = ObjectId(text_block_id)
         return await self.text_blocks_collection.find_one({"_id": object_id})
+<<<<<<< HEAD
 
     async def update_book_info(self, book_id, author_info):
         return await self.books_collection.update_one(
@@ -54,3 +72,5 @@ class BookRepository:
                 "$set": {"author_info": author_info}
             },  # Предполагается, что поле author_info добавлено в модель Book
         )
+=======
+>>>>>>> origin/backend_python

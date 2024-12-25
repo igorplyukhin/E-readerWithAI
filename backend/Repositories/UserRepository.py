@@ -2,8 +2,12 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from models.User import User
 from models.Book import Book
+<<<<<<< HEAD
 from utils.ReadSettings import get_setting
 
+=======
+from Utils.ReadSettings import get_setting
+>>>>>>> origin/backend_python
 
 class UserRepository:
     def __init__(self):
@@ -20,7 +24,12 @@ class UserRepository:
 
     async def update_user_password(self, login: str, new_password: str):
         return await self.users_collection.update_one(
+<<<<<<< HEAD
             {"_id": login}, {"$set": {"password": new_password}}
+=======
+            {"_id": login},
+            {"$set": {"password": new_password}}
+>>>>>>> origin/backend_python
         )
 
     async def delete_user(self, login: str):
@@ -28,6 +37,10 @@ class UserRepository:
 
     async def get_books_by_user(self, book_ids: list):
         object_id_list = [ObjectId(bid) for bid in book_ids]
+<<<<<<< HEAD
         return await self.books_collection.find(
             {"_id": {"$in": object_id_list}}
         ).to_list(length=None)
+=======
+        return await self.books_collection.find({"_id": {"$in": object_id_list}}).to_list(length=None)
+>>>>>>> origin/backend_python

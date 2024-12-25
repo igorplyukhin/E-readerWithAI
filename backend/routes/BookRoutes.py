@@ -5,11 +5,17 @@ from pydantic import BaseModel
 from typing import List, Optional
 import aiofiles
 from Services.BookService import BookService
+<<<<<<< HEAD
 from Services.GigaChatServices import get_author_info
 
 book_router = APIRouter()
 book_service = BookService()
 
+=======
+
+book_router = APIRouter()
+book_service = BookService()
+>>>>>>> origin/backend_python
 
 class Book(BaseModel):
     idBook: str
@@ -19,6 +25,7 @@ class Book(BaseModel):
     textBlockIds: List[str]
 
 
+<<<<<<< HEAD
 @book_router.post(
     "/api/book/upload",
     summary="Загрузить новую книгу",
@@ -28,19 +35,34 @@ class Book(BaseModel):
 async def upload_book(
     user_id: str = Query(..., description="Id пользователя"),
     file: UploadFile = File(..., description="Книга в формате PDF"),
+=======
+@book_router.post("/api/book/upload", summary="Загрузить новую книгу", description="",
+                      tags=["Загрузка и работа с файлами"])
+async def upload_book(
+    user_id: str = Query(..., description="Id пользователя"),
+    file: UploadFile = File(..., description="Книга в формате PDF")
+>>>>>>> origin/backend_python
 ):
     file_name = file.filename if file.filename else "default.fb2"
     upload_dir = "uploads"
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
+<<<<<<< HEAD
 
     file_path = os.path.join(upload_dir, file_name)
     try:
         async with aiofiles.open(file_path, "wb") as out_file:
+=======
+    
+    file_path = os.path.join(upload_dir, file_name)
+    try:
+        async with aiofiles.open(file_path, 'wb') as out_file:
+>>>>>>> origin/backend_python
             content = await file.read()
             await out_file.write(content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
+<<<<<<< HEAD
 
     if not file_path:
         raise HTTPException(status_code=500, detail="Error saving file")
@@ -69,6 +91,24 @@ async def upload_book(
     description="",
     tags=["Загрузка и работа с файлами"],
 )
+=======
+    
+    if not file_path:
+        raise HTTPException(status_code=500, detail="Error saving file")
+    
+    # Обработка загруженной книги
+    book_dict = await book_service.process_uploaded_book(file_path, file_name, user_id)
+
+    return JSONResponse(content={
+        "status": "success", 
+        "message": "Book uploaded and processed", 
+        "book": book_dict
+    })
+
+
+@book_router.get("/api/book/detail", summary="Получить загруженную книгу", description="",
+                      tags=["Загрузка и работа с файлами"])
+>>>>>>> origin/backend_python
 async def get_book_detail(id: str = Query(..., description="ID книги")):
     if not id:
         return JSONResponse(
@@ -80,18 +120,26 @@ async def get_book_detail(id: str = Query(..., description="ID книги")):
         # Получаем книгу по ID
         book_doc = await book_service.book_repository.get_book_by_id(id)
         if not book_doc:
+<<<<<<< HEAD
             return JSONResponse(
                 status_code=404,
                 content={"status": "error", "message": "Книга не найдена"},
             )
+=======
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Книга не найдена"})
+>>>>>>> origin/backend_python
 
         # Получаем текстовые блоки по их ID
         text_block_ids = book_doc.get("textBlockIds", [])
         text_blocks = []
         for block_id in text_block_ids:
+<<<<<<< HEAD
             text_block_doc = await book_service.book_repository.get_text_block_by_id(
                 block_id
             )
+=======
+            text_block_doc = await book_service.book_repository.get_text_block_by_id(block_id)
+>>>>>>> origin/backend_python
             if text_block_doc:
                 text_blocks.append(text_block_doc.get("original", ""))
 
@@ -99,11 +147,22 @@ async def get_book_detail(id: str = Query(..., description="ID книги")):
         response = {
             "annotation": book_doc.get("annotation", ""),
             "totalPages": len(text_block_ids),
+<<<<<<< HEAD
             "textBlocks": text_blocks,
+        }
+=======
+            "textBlocks": text_blocks
         }
 
         return JSONResponse(status_code=200, content=response)
+    
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": f"Ошибка при получении книги: {str(e)}"})
+>>>>>>> origin/backend_python
 
+        return JSONResponse(status_code=200, content=response)
+
+<<<<<<< HEAD
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -123,6 +182,13 @@ async def get_book_detail(id: str = Query(..., description="ID книги")):
 async def get_book_page(
     id: str = Query(..., description="ID книги"),
     page: int = Query(1, description="Номер страницы (начиная с 1)"),
+=======
+@book_router.get("/api/book/page", summary="Получить станицу щагруженной книги", description="",
+                      tags=["Загрузка и работа с файлами"])
+async def get_book_page(
+    id: str = Query(..., description="ID книги"),
+    page: int = Query(1, description="Номер страницы (начиная с 1)")
+>>>>>>> origin/backend_python
 ):
     if not id or page is None:
         return JSONResponse(
@@ -142,16 +208,21 @@ async def get_book_page(
     try:
         book_doc = await book_service.book_repository.get_book_by_id(id)
         if not book_doc:
+<<<<<<< HEAD
             return JSONResponse(
                 status_code=404,
                 content={"status": "error", "message": "Книга не найдена"},
             )
+=======
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Книга не найдена"})
+>>>>>>> origin/backend_python
 
         book = {
             "idBook": str(book_doc["_id"]),
             "title": book_doc.get("title", "Без названия"),
             "authors": book_doc.get("author", "Неизвестно"),
             "annotation": book_doc.get("annotation"),
+<<<<<<< HEAD
             "textBlockIds": book_doc.get("textBlockIds", []),
         }
 
@@ -171,6 +242,19 @@ async def get_book_page(
                 status_code=404,
                 content={"status": "error", "message": "Страница не найдена"},
             )
+=======
+            "textBlockIds": book_doc.get("textBlockIds", [])
+        }
+
+        if page > len(book["textBlockIds"]):
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Страница не найдена"})
+
+        text_block_id = book["textBlockIds"][page - 1]
+        text_block_doc = await book_service.book_repository.get_text_block_by_id(text_block_id)
+
+        if not text_block_doc:
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Страница не найдена"})
+>>>>>>> origin/backend_python
 
         text_block = {
             "_id": str(text_block_doc["_id"]),
@@ -179,6 +263,7 @@ async def get_book_page(
             "summary": text_block_doc.get("summary"),
             "summaryTime": text_block_doc.get("summaryTime"),
             "questions": text_block_doc.get("questions", []),
+<<<<<<< HEAD
             "rightAnswers": text_block_doc.get("rightAnswers", []),
         }
 
@@ -192,3 +277,12 @@ async def get_book_page(
                 "message": f"Ошибка при получении страницы книги: {str(e)}",
             },
         )
+=======
+            "rightAnswers": text_block_doc.get("rightAnswers", [])
+        }
+
+        return JSONResponse(status_code=200, content=text_block)
+    
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"status": "error", "message": f"Ошибка при получении страницы книги: {str(e)}"})
+>>>>>>> origin/backend_python

@@ -1,10 +1,15 @@
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from Repositories.BookRepository import BookRepository
+<<<<<<< HEAD
 from utils.BookProcessor import BookProcessor
 from utils.Fb2Processor import Fb2Processor
 from Services.GigaChatServices import get_author_info
 
+=======
+from Utils.BookProcessor import BookProcessor
+from Utils.Fb2Processor import Fb2Processor
+>>>>>>> origin/backend_python
 
 class BookService:
     def __init__(self):
@@ -43,9 +48,13 @@ class BookService:
 
         # Сериализуем и вставляем text_blocks
         text_block_documents = jsonable_encoder(text_blocks)
+<<<<<<< HEAD
         text_block_ids = await self.book_repository.insert_text_blocks(
             text_block_documents
         )
+=======
+        text_block_ids = await self.book_repository.insert_text_blocks(text_block_documents)
+>>>>>>> origin/backend_python
 
         # Обновляем книгу с textBlockIds
         await self.book_repository.update_book_text_block_ids(book_id, text_block_ids)
@@ -53,6 +62,7 @@ class BookService:
         # Обновляем пользователя
         await self.book_repository.update_user_books(user_id, book_id)
 
+<<<<<<< HEAD
         author_info = await get_author_info(
             book_dict["title"], book_dict["authors"], book_dict["annotation"] or ""
         )
@@ -71,4 +81,14 @@ class BookService:
             "pdf": "application/pdf",
             "fb2": "application/fb2+xml",
             "txt": "text/plain",
+=======
+        return book_dict
+
+    def get_supported_file_type(self, file_name: str) -> str:
+        extension = file_name.split('.')[-1].lower()
+        return {
+            "pdf": "application/pdf",
+            "fb2": "application/fb2+xml",
+            "txt": "text/plain"
+>>>>>>> origin/backend_python
         }.get(extension)
