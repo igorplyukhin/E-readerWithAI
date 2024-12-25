@@ -14,6 +14,12 @@ class CompressedTextService:
         self.db = self.client["book_compressor"]
         self.collection = self.db["compressed_texts"]
 
+    def split_text_into_blocks(self, text: str, block_size: int = 1000) -> list:
+        """
+        Разделяет текст на блоки по 1000 символов
+        """
+        return [text[i : i + block_size] for i in range(0, len(text), block_size)]
+
     async def save_compressed_text(
         self,
         book_id: str,
@@ -23,15 +29,18 @@ class CompressedTextService:
         compression_percent: int,
     ) -> str:
         try:
-            # Создаем новый ObjectId для документа
-            doc_id = ObjectId()
+            # Разделяем сжатый текст на блоки
+            text_blocks = self.split_text_into_blocks(compressed_text)
 
+            doc_id = ObjectId()
             document = {
                 "_id": doc_id,
-                "bookId": book_id,  # Здесь оставляем строку, так как это временный идентификатор
+                "bookId": book_id,
                 "title": title,
                 "originalText": original_text,
                 "compressedText": compressed_text,
+                "textBlocks": text_blocks,  # Массив блоков текста
+                "totalBlocks": len(text_blocks),  # Общее количество блоков
                 "compressionDate": datetime.now(),
                 "compressionPercent": compression_percent,
             }
@@ -48,11 +57,9 @@ class CompressedTextService:
 
     async def get_compressed_text(self, compressed_id: str):
         try:
-            # Преобразуем строку в ObjectId
             obj_id = ObjectId(compressed_id)
             result = await self.collection.find_one({"_id": obj_id})
             if result:
-                # Преобразуем ObjectId в строку для JSON-сериализации
                 result["_id"] = str(result["_id"])
                 return result
             return None
@@ -60,20 +67,6 @@ class CompressedTextService:
             logger.error(f"Ошибка при получении сжатого текста: {str(e)}")
             raise HTTPException(
                 status_code=500, detail=f"Error retrieving compressed text: {str(e)}"
-            )
-
-    async def get_book_compressions(self, book_id: str):
-        try:
-            cursor = self.collection.find({"bookId": book_id})
-            compressions = []
-            async for doc in cursor:
-                doc["_id"] = str(doc["_id"])
-                compressions.append(doc)
-            return compressions
-        except Exception as e:
-            logger.error(f"Ошибка при получении сжатых текстов книги: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Error retrieving book compressions: {str(e)}"
             )
 
     async def check_connection(self):
