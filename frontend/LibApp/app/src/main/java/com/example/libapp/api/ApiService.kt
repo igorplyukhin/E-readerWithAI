@@ -1,55 +1,56 @@
 package com.example.libapp.api
 
+import com.example.libapp.models.AuthResponse
 import com.example.libapp.models.BookDetailResponse
 import com.example.libapp.models.BookPageResponse
 import com.example.libapp.models.BookResponse
 import com.example.libapp.models.UserBooksResponse
-import com.example.libapp.models.UserResponse
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
 
-    // Существующие методы
+    // Метод регистрации пользователя
     @FormUrlEncoded
-    @POST("register")
-    fun register(
+    @POST("api/user/register")
+    fun registerUser(
         @Field("login") login: String,
         @Field("password") password: String
-    ): Call<UserResponse>
+    ): Call<AuthResponse>
 
+    // Метод авторизации пользователя
     @FormUrlEncoded
-    @POST("login")
-    fun login(
+    @POST("api/user/login")
+    fun loginUser(
         @Field("login") login: String,
         @Field("password") password: String
-    ): Call<UserResponse>
+    ): Call<AuthResponse>
 
-    @FormUrlEncoded
-    @POST("get_user")
+    // Метод получения данных пользователя
+    @GET("api/user/get")
     fun getUser(
-        @Field("login") login: String
+        @Query("login") login: String
     ): Call<UserBooksResponse>
 
+    // Метод загрузки книги
     @Multipart
-    @POST("upload_book")
+    @POST("api/book/upload")
     fun uploadBook(
-        @Part("id") userId: RequestBody,
+        @Query("user_id") userId: String,
         @Part file: MultipartBody.Part
     ): Call<BookResponse>
 
-    // Новый метод для получения детальной информации о книге
-    @GET("get_book_detail")
+    // Метод для получения детальной информации о книге
+    @GET("api/book/detail")
     fun getBookDetail(
-        @Query("id") bookId: String
+        @Query("bookId") bookId: String
     ): Call<BookDetailResponse>
 
-    // Новый метод для получения содержимого конкретной страницы
-    @GET("get_book_page")
+    // Метод для получения содержимого конкретной страницы
+    @GET("api/book/page")
     fun getBookPage(
-        @Query("id") bookId: String,
+        @Query("bookId") bookId: String,
         @Query("page") pageNumber: Int
     ): Call<BookPageResponse>
 }
