@@ -57,6 +57,4 @@
         <item name="android:background">@drawable/rounded_edittext</item>
     </style>
 
-
-
 </resources>
