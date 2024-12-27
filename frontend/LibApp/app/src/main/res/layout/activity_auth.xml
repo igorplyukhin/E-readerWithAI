@@ -1,79 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_auth"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".AuthActivity">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        tools:context=".AuthActivity">
 
-    <!-- EditText для ввода логина -->
-    <EditText
-        android:id="@+id/etLogin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:hint="Login"
-        android:padding="12dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/material_dynamic_neutral80"
-        android:textColorLink="@color/material_dynamic_neutral80"
-        app:layout_constraintBottom_toTopOf="@id/etPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    <!-- Заголовок приложения -->
+    <View
+            android:id="@+id/topDivider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#202123"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintBottom_toBottomOf="@+id/tvAppTitle"
+            android:layout_marginBottom="-16dp" />
 
-    <!-- EditText для ввода пароля -->
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/material_dynamic_neutral80"
-        android:textColorLink="@color/material_dynamic_neutral80"
-        app:layout_constraintBottom_toTopOf="@id/btnLogin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etLogin" />
+    <TextView
+            android:id="@+id/tvAppTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AIREADER\nGIGA\nCHAT"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="start"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/montserrat_extrabold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Кнопка "Login" -->
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="@color/black"
-        android:text="Login"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:padding="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPassword"
-        app:layout_constraintBottom_toTopOf="@id/btnRegister" />
+    <!-- Подзаголовок -->
+    <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Напарник в чтении"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/montserrat_black"
+            app:layout_constraintTop_toBottomOf="@+id/topDivider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="66dp" />
 
-    <!-- Кнопка "Register" -->
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/black"
-        android:text="Register"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:padding="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    <!-- GigaChat Max -->
+
+    <!-- Карточка с кнопками -->
+    <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="27dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#202123"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSubtitle"
+            android:layout_marginTop="73dp"
+            android:layout_marginEnd="27dp">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <!-- Кнопка регистрации -->
+
+            <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/img"
+                    android:id="@+id/imageView"
+                    android:layout_marginLeft="34dp"
+                    android:layout_marginRight="34dp" />
+
+            <!-- Разделительная линия -->
+            <View
+                    android:id="@+id/divider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="2dp"
+                    android:background="@color/gray_light"
+                    app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+
+            <!-- Кнопка входа через Сбер ID -->
+
+            <Button
+                    android:id="@+id/btnRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/blue"
+                    android:text="Зарегистрироваться"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textSize="14sp"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
+                    android:layout_marginLeft="17dp"
+                    android:layout_marginRight="17dp"
+                    android:layout_marginTop="17dp"
+                    android:layout_marginBottom="8dp"
+                    style="@style/CustomButton"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    app:cornerRadius="11dp" />
+
+            <!-- Кнопка входа через почту -->
+            <Button
+                    android:id="@+id/btnLoginEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/blue"
+                    android:text="Войти по логину"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textSize="14sp"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
+                    android:layout_marginLeft="17dp"
+                    android:layout_marginRight="17dp"
+                    android:layout_marginBottom="8dp"
+                    style="@style/CustomButton"
+                    app:cornerRadius="11dp" />
+
+            <Button
+                    android:id="@+id/btnLoginSber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#213A26"
+                    android:text="Войти по Сбер ID"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textSize="14sp"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
+                    android:layout_marginLeft="17dp"
+                    android:layout_marginRight="17dp"
+                    android:layout_marginBottom="17dp"
+                    style="@style/CustomButton"
+                    app:cornerRadius="11dp" />
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,10 +2,10 @@ package com.example.libapp
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.example.libapp.adapters.PageAdapter
@@ -28,7 +28,6 @@ class BookReadingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_book_reading)
 
         viewPager = findViewById(R.id.viewPager)
@@ -36,6 +35,11 @@ class BookReadingActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
 
         bookId = intent.getStringExtra("BOOK_ID")
+
+        // Обработка нажатия на кнопку "Назад"
+        findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener {
+            finish() // Закрывает текущую Activity и возвращается к предыдущей
+        }
 
         if (bookId != null) {
             showLoading() // Показываем загрузку при переходе

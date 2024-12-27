@@ -18,8 +18,44 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="SquareButton" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">4dp</item> <!-- Углы почти квадратные -->
+    </style>
 
+    <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <!-- Цвет движущейся полосы -->
+        <item name="android:progressDrawable">@drawable/progress_bar</item>
+    </style>
 
+    <style name="CustomButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">7dp</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="CustomEditText" parent="Widget.AppCompat.EditText">
+        <!-- Убираем стандартные отступы -->
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <!-- Устанавливаем текст -->
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+
+        <!-- Убираем внутренние отступы -->
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <!-- Устанавливаем закругленные углы -->
+        <item name="android:background">@drawable/rounded_edittext</item>
+    </style>
 
 
 

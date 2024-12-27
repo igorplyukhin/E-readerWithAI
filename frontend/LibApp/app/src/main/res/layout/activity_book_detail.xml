@@ -1,25 +1,237 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".BookDetailActivity">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#101317">
 
-    <!-- TextView for displaying the content of the book -->
+    <!-- Верхний цветной блок на заднем плане -->
+
+    <!-- Кнопка Назад -->
+
+    <View
+            android:id="@+id/topDivider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#434343"
+            app:layout_constraintBottom_toTopOf="@+id/midDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/arrow_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="Назад"
+            android:layout_marginTop="10dp" />
+
+    <!-- Обложка книги -->
+    <ImageView
+            android:id="@+id/imgBookCover"
+            android:layout_width="180dp"
+            android:layout_height="205dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/book_placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="20dp" />
+
+    <!-- Прогресс-бар -->
+    <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:max="100"
+            android:progressTint="#FFFFFF"
+            android:backgroundTint="#434343"
+            app:layout_constraintTop_toBottomOf="@id/imgBookCover"
+            app:layout_constraintStart_toStartOf="@+id/imgBookCover"
+            app:layout_constraintEnd_toEndOf="@+id/imgBookCover"
+            android:layout_marginTop="8dp"
+            android:secondaryProgressTint="#FFFFFF"
+            style="@style/CustomProgressBar" />
+
+    <!-- Название книги -->
+
+    <!-- Автор -->
+
+    <!-- Прогресс и время -->
     <TextView
-        android:id="@+id/tvBookContent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:gravity="top|start"
-        android:scrollbars="vertical"
-        tools:text="Sample book content goes here..."
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            android:id="@+id/tvBookTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
 
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/tvReadingStatus"
+            android:layout_marginTop="6dp" />
+
+    <TextView
+            android:id="@+id/tvBookAuthor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp"
+            android:text=""
+            android:textColor="#A39F9F"
+            android:textSize="12sp"
+            android:gravity="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:fontFamily="@font/montserrat" />
+
+    <!-- Разделитель между верхним блоком и кнопками -->
+
+    <!-- Кнопки действий -->
+    <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#A39F9F"
+            android:textSize="14sp"
+            android:fontFamily="@font/montserrat"
+            app:layout_constraintStart_toStartOf="@+id/progressBar"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            android:layout_marginTop="5dp" />
+
+    <TextView
+            android:id="@+id/tvReadingStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#A39F9F"
+            android:textSize="14sp"
+            android:fontFamily="@font/montserrat"
+            app:layout_constraintEnd_toEndOf="@+id/progressBar"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            android:layout_marginTop="5dp" />
+
+    <!-- Группа кнопок действий -->
+    <View
+            android:id="@+id/midDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#00FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBookAuthor"
+            android:layout_marginTop="41dp" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleGroupActions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="28dp"
+            android:layout_marginEnd="28dp"
+            app:layout_constraintBottom_toBottomOf="@+id/midDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/midDivider"
+            app:singleSelection="false">
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReadBook"
+                style="@style/SquareButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#CACBCE"
+                android:text="Читать книгу"
+                android:textColor="#000000"
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                android:letterSpacing="0"
+                android:insetRight="0.5dp" />
+        <!-- Разделитель -->
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompressText"
+                style="@style/SquareButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#CACBCE"
+                android:text="Сжать текст"
+                android:textColor="#000000"
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                android:letterSpacing="0"
+                android:insetLeft="0.5dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Аннотация -->
+
+    <!-- Описание автора -->
+    <TextView
+            android:id="@+id/tvAnnotation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text=""
+            android:textColor="#A39F9F"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/toggleGroupActions"
+            android:layout_marginTop="20dp" />
+
+    <TextView
+            android:id="@+id/tvAboutAuthor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvAnnotation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text=""
+            android:textColor="#A39F9F"
+            android:textSize="14sp" />
+
+    <!-- Разделительная линия -->
+    <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#CCCCCC"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- BottomNavigationView для нижней навигации -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:menu="@menu/bottom_nav_menu"
+            app:itemTextColor="@color/bottom_nav_text_color"
+            app:itemIconTint="@color/bottom_nav_text_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#101317"
+            app:labelVisibilityMode="labeled"
+            android:paddingBottom="5dp"
+            app:itemPaddingBottom="5dp"
+            app:itemPaddingTop="8dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

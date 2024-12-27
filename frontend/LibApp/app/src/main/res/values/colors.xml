@@ -4,4 +4,10 @@
     <color name="black">#101317</color>
     <color name="dark_gray">#333333</color>
 
+    <color name="blue">#4E84EB</color>
+    <color name="gray_light">#434343</color>
+    <color name="gray_dark">#2C2C2C</color>
+    <color name="green">#00FF00</color>
+
+
 </resources>
