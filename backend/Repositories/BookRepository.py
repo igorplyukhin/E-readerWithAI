@@ -1,8 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from fastapi import HTTPException
-from models.Book import Book
-from models.TextBlock import TextBlock
 from Utils.ReadSettings import get_setting
 
 class BookRepository:

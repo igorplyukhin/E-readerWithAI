@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, Query
+from fastapi import APIRouter, Form, Query, HTTPException
 from fastapi.responses import JSONResponse
 from Services.UserService import UserService
 
@@ -17,30 +17,32 @@ async def get_user(
     return JSONResponse(status_code=200, content=response.model_dump())
 
 
+# Регистрация пользователя
 @user_router.post("/api/user/register", summary="Зарегистрировать нового пользователя", description="",
-                      tags=["Пользователи"])
+                  tags=["Пользователи"])
 async def register(
-    login: str = Query(..., description="Имя пользователя"), 
-    password: str = Query(..., description="Пароль")):
-    
+    login: str = Form(..., description="Имя пользователя"), 
+    password: str = Form(..., description="Пароль")):
     if not login or not password:
-        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин или пароль не предоставлены"})
+        raise HTTPException(status_code=400, detail="Логин или пароль не предоставлены")
     
     await user_service.register_user(login, password)
-    return JSONResponse(content={"status": "success", "message": "Пользователь успешно зарегистрирован", "userId": login})
+    return {"status": "success", "message": "Пользователь успешно зарегистрирован", "userId": login}
 
-
+# Вход пользователя
 @user_router.post("/api/user/login", summary="Залогиниться в приложении", description="",
-                      tags=["Пользователи"])
+                  tags=["Пользователи"])
 async def login(
-    login: str = Query(..., description="Имя пользователя"), 
-    password: str = Query(..., description="Пароль")):
-    
+    login: str = Form(..., description="Имя пользователя"), 
+    password: str = Form(..., description="Пароль")):
     if not login or not password:
-        return JSONResponse(status_code=400, content={"status": "error", "message": "Логин или пароль не предоставлены"})
+        raise HTTPException(status_code=400, detail="Логин или пароль не предоставлены")
     
     response = await user_service.login_user(login, password)
-    return JSONResponse(content=response)
+    if response.get("status") == "error":
+        raise HTTPException(status_code=401, detail=response.get("message"))
+    
+    return {"status": "success", "message": "Вход успешен", "userId": response.get("userId")}
 
 
 @user_router.patch("/api/user/update", summary="Обновить данные пользователя", description="",

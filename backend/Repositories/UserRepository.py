@@ -1,7 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from models.User import User
-from models.Book import Book
 from Utils.ReadSettings import get_setting
 
 class UserRepository:

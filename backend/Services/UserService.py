@@ -26,8 +26,8 @@ class UserService:
             for doc in book_docs:
                 book = Book(
                     idBook=str(doc["_id"]),
-                    title=doc.get("title", "Без названия"),
-                    author=doc.get("author", "Неизвестно"),
+                    title=doc.get("title", ""),
+                    author=doc.get("author", ""),
                     description=doc.get("description", ""),
                     annotation=doc.get("annotation"),
                     status=doc.get("status", "reading"),
@@ -36,7 +36,8 @@ class UserService:
                     filePath=doc.get("filePath", ""),
                     blockStopBook=doc.get("blockStopBook", 0),
                     chapterStopBook=doc.get("chapterStopBook", 0),
-                    textBlockIds=doc.get("textBlockIds", [])
+                    textBlockIds=[str(tid) for tid in doc.get("textBlockIds", [])],
+                    progress=doc.get("progress", 0)
                 )
                 books.append(book)
 
@@ -53,9 +54,11 @@ class UserService:
     async def login_user(self, login: str, password: str):
         user_doc = await self.user_repository.find_user_by_login(login)
         if user_doc and user_doc.get("password") == password:
-            return {"status": "success", "message": "Аутентификация успешна", "userId": login}
-        else:
-            raise HTTPException(status_code=401, detail="Неверный пароль или пользователь не найден")
+            response = {"status": "success", "message": "Аутентификация успешна", "userId": login}
+            return response
+        
+        raise HTTPException(status_code=401, detail="Неверный пароль или пользователь не найден")
+
 
     async def update_user_password(self, login: str, new_password: str, old_password: str):
         user_doc = await self.user_repository.find_user_by_login(login)
