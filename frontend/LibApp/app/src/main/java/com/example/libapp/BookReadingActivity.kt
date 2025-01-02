@@ -128,11 +128,13 @@ class BookReadingActivity : AppCompatActivity() {
     private fun showLoading() {
         progressBar.visibility = View.VISIBLE
         viewPager.visibility = View.GONE
+        tvPageIndicator.visibility = View.GONE
     }
 
     // Скрываем прогресс бар
     private fun hideLoading() {
         progressBar.visibility = View.GONE
         viewPager.visibility = View.VISIBLE
+        tvPageIndicator.visibility = View.VISIBLE
     }
 }

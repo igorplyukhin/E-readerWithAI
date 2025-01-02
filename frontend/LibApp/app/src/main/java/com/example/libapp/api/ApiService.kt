@@ -53,4 +53,11 @@ interface ApiService {
         @Query("bookId") bookId: String,
         @Query("page") pageNumber: Int
     ): Call<BookPageResponse>
+
+    @PUT("api/book/updateCompressionLevel")
+    fun updateBookCompressionLevel(
+        @Query("bookId") bookId: String,
+        @Body compressionLevel: Map<String, Int>
+    ): Call<Void>
+
 }

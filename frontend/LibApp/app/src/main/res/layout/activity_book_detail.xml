@@ -137,7 +137,7 @@
     <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleGroupActions"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
             android:layout_marginStart="28dp"
             android:layout_marginEnd="28dp"
             app:layout_constraintBottom_toBottomOf="@+id/midDivider"
@@ -148,7 +148,6 @@
 
         <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReadBook"
-                style="@style/SquareButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -158,12 +157,13 @@
                 android:textSize="13sp"
                 android:textAllCaps="false"
                 android:letterSpacing="0"
-                android:insetRight="0.5dp" />
+                android:insetRight="0.5dp"
+                style="@style/CustomButton" />
         <!-- Разделитель -->
 
         <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCompressText"
-                style="@style/SquareButton"
+                style="@style/CustomButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -234,4 +234,28 @@
             android:paddingBottom="5dp"
             app:itemPaddingBottom="5dp"
             app:itemPaddingTop="8dp" />
+
+    <!-- Полноэкранный загрузочный экран -->
+    <View
+            android:id="@+id/fullScreenLoader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
+            android:visibility="gone" />
+
+    <!-- Прогресс-бар на полноэкранном экране -->
+    <ProgressBar
+            android:id="@+id/loaderProgressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,4 +8,14 @@
     <color name="gray_light">#434343</color>
     <color name="gray_dark">#2C2C2C</color>
     <color name="green">#00FF00</color>
+
+    <color name="primary">#2A2C33</color>
+    <color name="slider_active">#FFFFFF</color> <!-- Белый для активной линии -->
+    <color name="slider_inactive">#434343</color> <!-- Серый для неактивной линии -->
+    <color name="slider_thumb">#FFFFFF</color> <!-- Белый для ползунка -->
+    <color name="slider_tick">#434343</color> <!-- Фиолетовый для точек -->
+    <color name="slider_halo">#434343</color> <!-- Фиолетовый для гало -->
+
+
+
 </resources>

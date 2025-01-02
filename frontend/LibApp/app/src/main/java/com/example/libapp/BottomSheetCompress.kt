@@ -1,0 +1,58 @@
+package com.example.libapp
+
+import android.app.Dialog
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.slider.Slider
+
+class BottomSheetCompress : BottomSheetDialogFragment() {
+
+    private var onApplyClickListener: ((Int) -> Unit)? = null
+    private var currentCompressionLevel: Int = 0 // Текущее значение уровня сжатия
+
+    fun setOnApplyClickListener(listener: (Int) -> Unit) {
+        onApplyClickListener = listener
+    }
+
+    fun setCurrentCompressionLevel(level: Int) {
+        currentCompressionLevel = level
+    }
+
+    // Применяем кастомный стиль для BottomSheetDialog
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireContext(), R.style.CustomBottomSheetDialogTheme)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.bottom_sheet_compress, container, false)
+
+        val slider = view.findViewById<Slider>(R.id.sliderReadingTime)
+        val btnApply = view.findViewById<Button>(R.id.btnApply)
+        val btnClose = view.findViewById<ImageButton>(R.id.btnClose)
+
+        // Устанавливаем текущее значение слайдера
+        slider.value = currentCompressionLevel.toFloat()
+
+        // Обработчик для кнопки "Применить"
+        btnApply.setOnClickListener {
+            onApplyClickListener?.invoke(slider.value.toInt())
+            dismiss()
+        }
+
+        // Обработчик для кнопки "Закрыть"
+        btnClose.setOnClickListener {
+            dismiss() // Закрыть BottomSheet
+        }
+
+        return view
+    }
+}

@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="59dp"
+        android:height="58dp"
+        android:viewportWidth="59"
+        android:viewportHeight="58">
+
+    <!-- Внешний круг -->
+    <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M29.954,0A29,29,0,1,1,29.954,58A29,29,0,1,1,29.954,0Z" />
+
+    <!-- Внутренний элемент -->
+    <path
+            android:strokeColor="#000000"
+            android:strokeWidth="0.7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M18.8439,24.2256C19.6396,25.2865 19.9049,27.4085 19.9049,29 19.9049,30.5914 19.6396,32.7134 18.8439,33.7743M21.4539,20.8909C21.2284,20.1886 21.7488,19.4512 22.4867,19.4512H36.4205C37.1584,19.4512 37.6788,20.1886 37.4534,20.8909C36.8274,22.8463 35.8195,26.3953 35.8195,29 35.8195,31.6046 36.8274,35.1536 37.4534,37.109C37.6788,37.8114 37.1584,38.5487 36.4205,38.5487H22.4867C21.7488,38.5487 21.2284,37.8114 21.4539,37.109C22.0798,35.1536 23.0878,31.6046 23.0878,29 23.0878,26.3953 22.0798,22.8463 21.4539,20.8909Z" />
+    <path
+            android:strokeColor="#000000"
+            android:strokeWidth="0.7"
+            android:strokeLineCap="round"
+            android:pathData="M26.7708,24.4912H33.1366M26.7708,29.0004H33.1366M26.7708,33.2443H28.8927" />
+    <path
+            android:strokeColor="#000000"
+            android:strokeWidth="0.7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M39.5634,24.2256C38.7677,25.2866 38.5024,27.4085 38.5024,29 38.5024,30.5914 38.7677,32.1829 39.5634,33.7744" />
+</vector>

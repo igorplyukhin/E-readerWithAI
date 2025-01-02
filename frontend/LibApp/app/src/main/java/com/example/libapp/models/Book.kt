@@ -9,5 +9,6 @@ data class Book(
     val nameFile: String,
     val filePath: String,
     val progress: Int,
-    val status: String
+    val status: String,
+    val compressionLevel: Int
 )

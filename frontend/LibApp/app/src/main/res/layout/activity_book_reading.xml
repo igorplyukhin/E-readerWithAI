@@ -68,7 +68,7 @@
             android:id="@+id/tvPageIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Страница 1 из 10"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -7,5 +7,6 @@ data class BookDetailResponse(
     val progress: Int,
     val totalPages: Int,
     val textBlocks: List<String>,
-    val status: String
+    val status: String,
+    val compressionLevel: Int
 )

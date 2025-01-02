@@ -57,4 +57,48 @@
         <item name="android:background">@drawable/rounded_edittext</item>
     </style>
 
+    <style name="SliderStyle" parent="Widget.MaterialComponents.Slider">
+        <!-- Цвет активной части трека -->
+        <item name="trackColorActive">@color/slider_active</item>
+        <!-- Цвет неактивной части трека -->
+        <item name="trackColorInactive">@color/slider_inactive</item>
+        <!-- Цвет точек -->
+        <item name="tickColor">@color/slider_tick</item>
+        <!-- Цвет точек после текущего значения -->
+        <item name="tickColorInactive">@color/slider_inactive</item>
+        <!-- Размер точки (гало) -->
+        <item name="haloColor">@color/slider_halo</item>
+        <!-- Размер гало -->
+        <item name="haloRadius">8dp</item>
+        <!-- Цвет ползунка -->
+        <item name="thumbColor">@color/slider_thumb</item>
+        <!-- Размер ползунка -->
+        <item name="thumbRadius">12dp</item>
+        <!-- Высота трека -->
+        <item name="trackHeight">4dp</item>
+        <item name="android:minHeight">0dp</item> <!-- Минимальная высота -->
+        <item name="android:paddingTop">0dp</item> <!-- Убираем отступ сверху -->
+        <item name="android:paddingBottom">0dp</item> <!-- Убираем отступ снизу -->
+    </style>
+
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <!-- Прозрачный фон -->
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet">
+        <!-- Убираем цветной фон -->
+        <item name="android:background">@android:color/transparent</item>
+        <!-- Настраиваем закруглённые углы -->
+        <item name="shapeAppearanceOverlay">@style/BottomSheetShape</item>
+    </style>
+
+    <style name="BottomSheetShape" parent="ShapeAppearanceOverlay.MaterialComponents.BottomSheet">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+
+
+
 </resources>

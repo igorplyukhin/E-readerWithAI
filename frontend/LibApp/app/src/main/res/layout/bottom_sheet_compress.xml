@@ -1,0 +1,186 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_sheet_background">
+
+    <!-- Кнопка выхода -->
+    <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/close"
+            android:contentDescription="Закрыть"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp" />
+
+    <!-- Иконка -->
+    <ImageView
+            android:id="@+id/imgIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/compress"
+            android:layout_marginTop="-15dp" />
+
+    <!-- Заголовок -->
+    <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Выберите время прочтения"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_bold" />
+
+    <!-- Слайдер -->
+    <com.google.android.material.slider.Slider
+            android:id="@+id/sliderReadingTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:valueFrom="0"
+            android:valueTo="75"
+            android:stepSize="25"
+            style="@style/SliderStyle"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+    <!-- Линии и текстовые метки -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="33dp"
+            android:layout_marginEnd="35dp">
+
+        <!-- Линия и текст для 30 мин -->
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="690 мин"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:fontFamily="@font/inter_medium" />
+        </LinearLayout>
+
+        <!-- Линия и текст для 173 мин -->
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.337"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                    android:layout_width="1dp"
+                    android:layout_height="6dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="345 мин"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:fontFamily="@font/inter_medium" />
+        </LinearLayout>
+
+        <!-- Линия и текст для 345 мин -->
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.6715"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                    android:layout_width="1dp"
+                    android:layout_height="6dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="173 мин"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:fontFamily="@font/inter_medium" />
+        </LinearLayout>
+
+        <!-- Линия и текст для 690 мин -->
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:background="@color/white"
+                    android:layout_gravity="center" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="30 мин"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:fontFamily="@font/inter_medium" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Кнопка Применить -->
+    <Button
+            android:id="@+id/btnApply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:backgroundTint="#37383D"
+            android:text="Применить"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            style="@style/CustomButton"
+            android:fontFamily="@font/montserrat_bold"
+            android:layout_marginBottom="25dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp" />
+
+</LinearLayout>

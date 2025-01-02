@@ -177,7 +177,7 @@ class BooksActivity : AppCompatActivity() {
 
     private fun uriToFile(uri: Uri): File {
         val fileName = getFileName(uri)
-        val tempFile = File.createTempFile("upload_", fileName, cacheDir)
+        val tempFile = File(cacheDir, fileName)
         tempFile.outputStream().use { outputStream ->
             contentResolver.openInputStream(uri)?.use { inputStream ->
                 inputStream.copyTo(outputStream)
@@ -195,7 +195,7 @@ class BooksActivity : AppCompatActivity() {
                 name = it.getString(nameIndex)
             }
         }
-        return name.substringBeforeLast('.')
+        return name
     }
 
     private fun showLoading() {
