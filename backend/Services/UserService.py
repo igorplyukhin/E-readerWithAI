@@ -14,7 +14,7 @@ class UserService:
             raise HTTPException(status_code=404, detail="Пользователь не найден")
 
         user = User(
-            idUser =user_doc["_id"],
+            idUser=user_doc["_id"],
             password=user_doc.get("password", ""),
             bookIds=user_doc.get("bookIds", []),
             countBook=user_doc.get("countBook", 0)
@@ -37,7 +37,8 @@ class UserService:
                     blockStopBook=doc.get("blockStopBook", 0),
                     chapterStopBook=doc.get("chapterStopBook", 0),
                     textBlockIds=[str(tid) for tid in doc.get("textBlockIds", [])],
-                    progress=doc.get("progress", 0)
+                    progress=doc.get("progress", 0),
+                    compressionLevel=doc.get("compressionLevel", 0)  
                 )
                 books.append(book)
 
@@ -58,7 +59,6 @@ class UserService:
             return response
         
         raise HTTPException(status_code=401, detail="Неверный пароль или пользователь не найден")
-
 
     async def update_user_password(self, login: str, new_password: str, old_password: str):
         user_doc = await self.user_repository.find_user_by_login(login)

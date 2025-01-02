@@ -17,6 +17,7 @@ class Book(BaseModel):
     chapterStopBook: int = Field(default=0, description="Номер последней прочитанной главы")
     textBlockIds: List[str] = Field(default_factory=list, description="Список идентификаторов текстовых блоков")
     progress: int = Field(default=0, ge=0, le=100, description="Прогресс чтения книги в процентах")
+    compressionLevel: int = Field(default=0, ge=0, le=75, description="Уровень сжатия текста книги")  
 
     @validator("status")
     def validate_status(cls, value):
@@ -50,6 +51,7 @@ class Book(BaseModel):
             "chapterStopBook": self.chapterStopBook,
             "textBlockIds": [ObjectId(tid) for tid in self.textBlockIds],
             "progress": self.progress,
+            "compressionLevel": self.compressionLevel,  # Добавлено новое поле
         }
 
     @classmethod
@@ -71,4 +73,5 @@ class Book(BaseModel):
             chapterStopBook=doc.get("chapterStopBook", 0),
             textBlockIds=[str(tid) for tid in doc.get("textBlockIds", [])],
             progress=doc.get("progress", 0),
+            compressionLevel=doc.get("compressionLevel", 50),  # Добавлено новое поле
         )

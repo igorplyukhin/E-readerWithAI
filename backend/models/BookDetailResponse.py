@@ -9,3 +9,4 @@ class BookDetailResponse(BaseModel):
     totalPages: int = Field(..., description="Общее количество страниц в книге")
     textBlocks: List[str] = Field(..., description="Список идентификаторов текстовых блоков")
     status: str = Field(..., description="Статус книги (чтение, завершено и т.д.)")  # Статус чтения книги
+    compressionLevel: int = Field(default=0, ge=0, le=75, description="Уровень сжатия текста книги") 

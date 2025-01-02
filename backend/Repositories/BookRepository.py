@@ -1,6 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from Utils.ReadSettings import get_setting
+from pymongo.results import UpdateResult
 
 class BookRepository:
     def __init__(self):
@@ -41,3 +42,14 @@ class BookRepository:
     async def get_text_block_by_id(self, text_block_id):
         object_id = ObjectId(text_block_id)
         return await self.text_blocks_collection.find_one({"_id": object_id})
+    
+    async def update_book_field(self, book_id: str, field_name: str, value) -> UpdateResult:
+        try:
+            result = await self.books_collection.update_one(  
+                {"_id": ObjectId(book_id)},
+                {"$set": {field_name: value}}
+            )
+            return result
+        except Exception as e:
+            raise Exception(f"Ошибка при обновлении поля книги: {e}")
+

@@ -1,9 +1,10 @@
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Body
 from fastapi.responses import JSONResponse
 import aiofiles
 from Services.BookService import BookService
 from models.BookPageResponse import BookPageResponse
+from models.CompressionUpdateRequest import CompressionUpdateRequest
 import logging
 
 book_router = APIRouter()
@@ -68,7 +69,8 @@ async def get_book_detail(
             "progress": book_doc.get("progress", 0),
             "totalPages": len(text_block_ids),
             "textBlocks": text_blocks,
-            "status": book_doc.get("status", "reading")
+            "status": book_doc.get("status", "reading"),
+            "compressionLevel": book_doc.get("compressionLevel", 0)  
         }
 
         return JSONResponse(status_code=200, content=response)
@@ -122,4 +124,30 @@ async def get_book_page(
     except Exception as e:
         logging.exception(f"Ошибка получения страницы книги {bookId}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка получения страницы книги: {str(e)}")
+    
+@book_router.put("/api/book/updateCompressionLevel", summary="Обновить уровень сжатия книги")
+async def update_compression_level(
+    bookId: str = Query(..., description="ID книги"),
+    request: CompressionUpdateRequest = Body(...)
+):
+    try:
+        logging.info(f"Received request to update compression level for bookId={bookId}, compressionLevel={request.compressionLevel}")
+        
+        # Проверяем границы значений
+        if not (0 <= request.compressionLevel <= 75):
+            raise HTTPException(status_code=400, detail="Уровень сжатия должен быть от 0 до 75")
+        
+        # Обновляем уровень сжатия через репозиторий
+        result = await book_service.book_repository.update_book_field(bookId, "compressionLevel", request.compressionLevel)
+
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Книга не найдена или не удалось обновить")
+
+        return JSONResponse(content={"status": "success", "message": "Уровень сжатия успешно обновлен"})
+    except Exception as e:
+        logging.error(f"Error updating compression level for bookId={bookId}: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка обновления уровня сжатия: {str(e)}")
+
+
+
 

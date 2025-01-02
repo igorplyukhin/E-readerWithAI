@@ -70,16 +70,17 @@ class BookProcessor:
 
         id_book = str(ObjectId())
         return Book(
-            idBook=id_book,
-            title=book_text.title,
-            author=book_text.authors,
-            description=book_text.content,
-            annotation=book_text.annotation,
-            status="reading",
-            mode="default",
-            nameFile=self.name_file,
-            filePath=self.file_path
-        )
+        idBook=id_book,
+        title=book_text.title,
+        author=book_text.authors,
+        description=book_text.content,
+        annotation=book_text.annotation,
+        status="reading",
+        mode="default",
+        nameFile=self.name_file,
+        filePath=self.file_path,
+        compressionLevel=0
+    )
 
     def extract_line_content(self, content: str, prefix: str) -> Optional[str]:
         pattern = re.compile(prefix + r"\s*(.*)", re.IGNORECASE)
