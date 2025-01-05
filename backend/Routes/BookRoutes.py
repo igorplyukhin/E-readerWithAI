@@ -43,8 +43,12 @@ async def upload_book(
 @book_router.get("/api/book/detail", summary="Получить детали книги", description="",
                  tags=["Загрузка и работа с файлами"])
 async def get_book_detail(
-    bookId: str = Query(..., description="ID книги")  # Исправлено с id на bookId
+    bookId: str = Query(..., description="ID книги")
 ):
+    """
+    Исправленный метод get_book_detail, который берёт сжатые блоки 
+    из коллекции compressed_text_blocks через get_compressed_blocks_by_ids(...).
+    """
     try:
         # Получение документа книги
         book_doc = await book_service.book_repository.get_book_by_id(bookId)
@@ -54,12 +58,25 @@ async def get_book_detail(
         # Получение идентификаторов текстовых блоков
         text_block_ids = book_doc.get("textBlockIds", [])
         
-        # Извлечение текстовых блоков
-        text_blocks = [
-            await book_service.book_repository.get_text_block_by_id(block_id)
-            for block_id in text_block_ids
-        ]
-        text_blocks = [block.get("original", "") for block in text_blocks if block]
+        # Извлекаем оригинальные (несжатые) текстовые блоки, если нужно
+        original_text_blocks = []
+        for block_id in text_block_ids:
+            block_doc = await book_service.book_repository.get_text_block_by_id(block_id)
+            if block_doc:
+                original_text_blocks.append(block_doc.get("original", ""))
+
+        # Обработка сжатых текстов
+        compressed_text = book_doc.get("compressedText", {"25": [], "50": [], "75": []})
+
+        # Для каждого уровня сжатия берём ID блоков из коллекции compressed_text_blocks
+        for compression_key, block_ids in compressed_text.items():
+            # Запрашиваем документы именно в compressed_text_blocks
+            compressed_docs = await book_service.book_repository.get_compressed_blocks_by_ids(block_ids)
+            # У каждого документа, скорее всего, поле "content" 
+            # (в вашем примере: 'content': "...", 'compressionLevel': 25, 'bookId': ...)
+            compressed_text[compression_key] = [
+                doc.get("content", "") for doc in compressed_docs if doc
+            ]
 
         # Формирование ответа
         response = {
@@ -68,15 +85,17 @@ async def get_book_detail(
             "annotation": book_doc.get("annotation", ""),
             "progress": book_doc.get("progress", 0),
             "totalPages": len(text_block_ids),
-            "textBlocks": text_blocks,
+            "textBlocks": original_text_blocks,
+            "compressedText": compressed_text,  # уже подставлены правильные content
             "status": book_doc.get("status", "reading"),
-            "compressionLevel": book_doc.get("compressionLevel", 0)  
+            "compressionLevel": book_doc.get("compressionLevel", 0)
         }
 
         return JSONResponse(status_code=200, content=response)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка получения книги: {str(e)}")
+
 
 
 @book_router.get("/api/book/page", summary="Получить страницу книги", description="",
@@ -139,6 +158,9 @@ async def update_compression_level(
         
         # Обновляем уровень сжатия через репозиторий
         result = await book_service.book_repository.update_book_field(bookId, "compressionLevel", request.compressionLevel)
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Книга не найдена или не удалось обновить")
+
 
         if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Книга не найдена или не удалось обновить")

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel, Field, validator
 from bson import ObjectId
 
@@ -16,8 +16,12 @@ class Book(BaseModel):
     blockStopBook: int = Field(default=0, description="Номер последнего прочитанного блока")
     chapterStopBook: int = Field(default=0, description="Номер последней прочитанной главы")
     textBlockIds: List[str] = Field(default_factory=list, description="Список идентификаторов текстовых блоков")
+    compressedText: Dict[str, List[str]] = Field(
+        default_factory=lambda: {"25": [], "50": [], "75": []},
+        description="Сжатые тексты по уровням сжатия (25, 50, 75)"
+    )
     progress: int = Field(default=0, ge=0, le=100, description="Прогресс чтения книги в процентах")
-    compressionLevel: int = Field(default=0, ge=0, le=75, description="Уровень сжатия текста книги")  
+    compressionLevel: int = Field(default=0, ge=0, le=75, description="Уровень сжатия текста книги")
 
     @validator("status")
     def validate_status(cls, value):
@@ -50,8 +54,9 @@ class Book(BaseModel):
             "blockStopBook": self.blockStopBook,
             "chapterStopBook": self.chapterStopBook,
             "textBlockIds": [ObjectId(tid) for tid in self.textBlockIds],
+            "compressedText": self.compressedText,
             "progress": self.progress,
-            "compressionLevel": self.compressionLevel,  # Добавлено новое поле
+            "compressionLevel": self.compressionLevel,
         }
 
     @classmethod
@@ -72,6 +77,7 @@ class Book(BaseModel):
             blockStopBook=doc.get("blockStopBook", 0),
             chapterStopBook=doc.get("chapterStopBook", 0),
             textBlockIds=[str(tid) for tid in doc.get("textBlockIds", [])],
+            compressedText=doc.get("compressedText", {"25": [], "50": [], "75": []}),
             progress=doc.get("progress", 0),
-            compressionLevel=doc.get("compressionLevel", 50),  # Добавлено новое поле
+            compressionLevel=doc.get("compressionLevel", 50),
         )

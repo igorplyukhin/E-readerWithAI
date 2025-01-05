@@ -5,7 +5,9 @@ from PyPDF2 import PdfReader
 from models.BookText import BookText
 from models.Book import Book
 from models.TextBlock import TextBlock
-from Utils.Fb2Processor import Fb2Processor  # Предполагается, что вы уже адаптировали Fb2Processor
+from Utils.Fb2Processor import Fb2Processor
+from Utils.TextUtils import split_into_blocks
+
 
 class BookProcessor:
     def __init__(self, file_path: str, name_file: str):
@@ -70,17 +72,23 @@ class BookProcessor:
 
         id_book = str(ObjectId())
         return Book(
-        idBook=id_book,
-        title=book_text.title,
-        author=book_text.authors,
-        description=book_text.content,
-        annotation=book_text.annotation,
-        status="reading",
-        mode="default",
-        nameFile=self.name_file,
-        filePath=self.file_path,
-        compressionLevel=0
-    )
+            idBook=id_book,
+            title=book_text.title,
+            author=book_text.authors,
+            description=book_text.content,
+            annotation=book_text.annotation,
+            status="reading",
+            mode="default",
+            nameFile=self.name_file,
+            filePath=self.file_path,
+            compressionLevel=0,
+            compressedText={  
+                "25": [],
+                "50": [],
+                "75": []
+            }
+        )
+
 
     def extract_line_content(self, content: str, prefix: str) -> Optional[str]:
         pattern = re.compile(prefix + r"\s*(.*)", re.IGNORECASE)
@@ -89,19 +97,11 @@ class BookProcessor:
             return match.group(1).strip()
         return None
 
-    def divide_chapter_into_blocks(self, chapter: str, block_size: int = 1000) -> List[str]:
-        blocks = []
-        start_index = 0
-        while start_index < len(chapter):
-            end_index = min(start_index + block_size, len(chapter))
-            blocks.append(chapter[start_index:end_index])
-            start_index = end_index
-        return blocks
-
     def process_chapters_and_blocks(self, chapters: List[str]) -> List[TextBlock]:
         text_blocks = []
         for chapter_index, chapter_content in enumerate(chapters):
-            blocks = self.divide_chapter_into_blocks(chapter_content)
+            # Используем split_into_blocks для разбиения текста на блоки
+            blocks = split_into_blocks(chapter_content)  # Вызов функции
             for block_content in blocks:
                 text_block = TextBlock(
                     _id=str(ObjectId()),
@@ -110,3 +110,4 @@ class BookProcessor:
                 )
                 text_blocks.append(text_block)
         return text_blocks
+

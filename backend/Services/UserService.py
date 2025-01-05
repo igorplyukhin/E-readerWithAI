@@ -24,6 +24,7 @@ class UserService:
         if user.bookIds:
             book_docs = await self.user_repository.get_books_by_user(user.bookIds)
             for doc in book_docs:
+                compressed_text = doc.get("compressedText", {"25": [], "50": [], "75": []})
                 book = Book(
                     idBook=str(doc["_id"]),
                     title=doc.get("title", ""),
@@ -38,7 +39,8 @@ class UserService:
                     chapterStopBook=doc.get("chapterStopBook", 0),
                     textBlockIds=[str(tid) for tid in doc.get("textBlockIds", [])],
                     progress=doc.get("progress", 0),
-                    compressionLevel=doc.get("compressionLevel", 0)  
+                    compressionLevel=doc.get("compressionLevel", 0),
+                    compressedText=compressed_text
                 )
                 books.append(book)
 

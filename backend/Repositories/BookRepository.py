@@ -2,6 +2,10 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from Utils.ReadSettings import get_setting
 from pymongo.results import UpdateResult
+from typing import List, Dict
+import logging
+
+logger = logging.getLogger(__name__)
 
 class BookRepository:
     def __init__(self):
@@ -9,6 +13,7 @@ class BookRepository:
         self.db = self.client[get_setting("DbName")]
         self.books_collection = self.db["books"]
         self.text_blocks_collection = self.db["text_blocks"]
+        self.compressed_text_blocks_collection = self.db["compressed_text_blocks"] 
         self.users_collection = self.db["users"]
 
     async def insert_book(self, book_dict):
@@ -43,13 +48,75 @@ class BookRepository:
         object_id = ObjectId(text_block_id)
         return await self.text_blocks_collection.find_one({"_id": object_id})
     
+    async def get_compressed_blocks(self, block_ids: List[str]) -> List[dict]:
+        object_ids = [ObjectId(block_id) for block_id in block_ids]
+        return await self.db["compressed_text_blocks"].find({"_id": {"$in": object_ids}}).to_list(length=None)
+
+    
     async def update_book_field(self, book_id: str, field_name: str, value) -> UpdateResult:
         try:
-            result = await self.books_collection.update_one(  
+            result = await self.books_collection.update_one(
                 {"_id": ObjectId(book_id)},
                 {"$set": {field_name: value}}
             )
-            return result
+            return result  # Возвращаем результат
         except Exception as e:
+            logger.error(f"Ошибка при обновлении поля {field_name} книги с ID {book_id}: {e}")
             raise Exception(f"Ошибка при обновлении поля книги: {e}")
+
+
+    async def save_compressed_blocks(self, book_id: str, compression_level: int, compressed_blocks: List[str]) -> List[str]:
+        try:
+            # Получаем документ книги
+            book = await self.get_book_by_id(book_id)
+            if not book:
+                logger.error(f"Книга с ID {book_id} не найдена.")
+                raise Exception("Книга не найдена")
+
+            # Обновляем compressedText
+            compressed_text = book.get("compressedText", {})
+            compression_key = str(compression_level)
+
+            # Проверяем существующие данные и добавляем/обновляем блоки
+            compressed_text[compression_key] = compressed_blocks
+            logger.info(f"Обновляем поле compressedText для книги {book_id}: {compressed_text}")
+
+            # Сохраняем изменения
+            update_result = await self.update_book_field(book_id, "compressedText", compressed_text)
+            if not update_result:
+                logger.error(f"Не удалось обновить поле compressedText для книги {book_id}.")
+                raise Exception(f"Не удалось обновить поле compressedText для книги {book_id}.")
+
+            logger.info(f"Сжатые блоки успешно сохранены для книги {book_id}, уровень сжатия: {compression_level}.")
+            return compressed_blocks
+        except Exception as e:
+            logger.error(f"Ошибка при сохранении сжатых блоков для книги {book_id}: {e}")
+            raise Exception(f"Ошибка при сохранении сжатых блоков: {e}")
+
+
+    async def insert_compressed_block(self, book_id: str, compression_level: int, content: str) -> str:
+        try:
+            compressed_block = {
+                "content": content,
+                "compressionLevel": compression_level,
+                "bookId": book_id
+            }
+            result = await self.compressed_text_blocks_collection.insert_one(compressed_block)
+            logger.info(f"Сжатый блок успешно добавлен с ID {result.inserted_id} для книги {book_id}.")
+            return str(result.inserted_id)
+        except Exception as e:
+            logger.error(f"Ошибка при вставке сжатого блока для книги {book_id}: {e}")
+            raise Exception(f"Ошибка при вставке сжатого блока: {e}")
+        
+    async def get_compressed_blocks_by_ids(self, block_ids: List[str]) -> List[Dict]:
+        object_ids = [ObjectId(block_id) for block_id in block_ids]
+        blocks = await self.compressed_text_blocks_collection.find(
+            {"_id": {"$in": object_ids}}
+        ).to_list(length=len(block_ids))
+        return blocks
+
+
+
+
+
 
