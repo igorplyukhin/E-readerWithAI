@@ -4,6 +4,7 @@ import com.example.libapp.models.AuthResponse
 import com.example.libapp.models.BookDetailResponse
 import com.example.libapp.models.BookPageResponse
 import com.example.libapp.models.BookResponse
+import com.example.libapp.models.CompressionResponse
 import com.example.libapp.models.UserBooksResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
@@ -59,5 +60,13 @@ interface ApiService {
         @Query("bookId") bookId: String,
         @Body compressionLevel: Map<String, Int>
     ): Call<Void>
+
+    @POST("api/gigachat/compress-book")
+    fun compressBook(
+        @Query("book_id") bookId: String,
+        @Query("compression_level") compressionLevel: Int
+    ): Call<CompressionResponse>
+
+
 
 }

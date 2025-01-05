@@ -8,5 +8,6 @@ data class BookDetailResponse(
     val totalPages: Int,
     val textBlocks: List<String>,
     val status: String,
-    val compressionLevel: Int
+    val compressionLevel: Int,
+    val compressedText: Map<String, List<String>>? = null
 )

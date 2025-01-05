@@ -1,6 +1,7 @@
 package com.example.libapp
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,17 +15,21 @@ import com.google.android.material.slider.Slider
 class BottomSheetCompress : BottomSheetDialogFragment() {
 
     private var onApplyClickListener: ((Int) -> Unit)? = null
+    private var onDismissListener: (() -> Unit)? = null // Слушатель на закрытие окна
     private var currentCompressionLevel: Int = 0 // Текущее значение уровня сжатия
 
     fun setOnApplyClickListener(listener: (Int) -> Unit) {
         onApplyClickListener = listener
     }
 
+    fun setOnDismissListener(listener: () -> Unit) {
+        onDismissListener = listener
+    }
+
     fun setCurrentCompressionLevel(level: Int) {
         currentCompressionLevel = level
     }
 
-    // Применяем кастомный стиль для BottomSheetDialog
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(requireContext(), R.style.CustomBottomSheetDialogTheme)
     }
@@ -39,20 +44,28 @@ class BottomSheetCompress : BottomSheetDialogFragment() {
         val btnApply = view.findViewById<Button>(R.id.btnApply)
         val btnClose = view.findViewById<ImageButton>(R.id.btnClose)
 
-        // Устанавливаем текущее значение слайдера
         slider.value = currentCompressionLevel.toFloat()
 
-        // Обработчик для кнопки "Применить"
         btnApply.setOnClickListener {
             onApplyClickListener?.invoke(slider.value.toInt())
             dismiss()
         }
 
-        // Обработчик для кнопки "Закрыть"
         btnClose.setOnClickListener {
-            dismiss() // Закрыть BottomSheet
+            dismiss()
         }
 
         return view
     }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissListener?.invoke() // Вызываем слушатель на закрытие
+    }
+
+    fun updateSliderValue(level: Int) {
+        val slider = view?.findViewById<Slider>(R.id.sliderReadingTime)
+        slider?.value = level.toFloat()
+    }
 }
+

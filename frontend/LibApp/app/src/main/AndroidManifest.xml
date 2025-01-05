@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Разрешение на интернет и доступ к файловой системе -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Разрешение на уведомления (Android 13+, иначе уведомления не будут отображаться) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 
     <application
             android:allowBackup="true"
@@ -17,6 +23,10 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.LibApp"
             tools:targetApi="31">
+
+        <!-- Если целитесь на Android 13 или выше, можно сменить targetApi="33",
+             а также в Gradle выставить targetSdkVersion 33, но это опционально. -->
+
         <activity
                 android:name=".BottomSheetCompress"
                 android:exported="false" />
@@ -43,14 +53,15 @@
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Предзагруженные шрифты, если используете -->
         <meta-data
                 android:name="preloaded_fonts"
                 android:resource="@array/preloaded_fonts" />
+
     </application>
 
 </manifest>
