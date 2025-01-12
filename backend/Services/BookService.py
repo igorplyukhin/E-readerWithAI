@@ -3,8 +3,6 @@ from fastapi.encoders import jsonable_encoder
 from Repositories.BookRepository import BookRepository
 from Utils.BookProcessor import BookProcessor
 from Utils.Fb2Processor import Fb2Processor
-from bson import ObjectId
-from pymongo.results import UpdateResult
 
 class BookService:
     def __init__(self):

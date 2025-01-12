@@ -1,8 +1,6 @@
 from typing import List, Literal, Optional
-from fastapi.responses import JSONResponse
 import requests
 import uuid
-from bson import ObjectId
 from Utils.ReadSettings import get_setting
 from Utils.TextUtils import split_into_blocks
 import logging

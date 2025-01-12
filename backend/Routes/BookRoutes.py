@@ -3,12 +3,13 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Body
 from fastapi.responses import JSONResponse
 import aiofiles
 from Services.BookService import BookService
-from models.BookPageResponse import BookPageResponse
 from models.CompressionUpdateRequest import CompressionUpdateRequest
 import logging
 
 book_router = APIRouter()
 book_service = BookService()
+
+logger = logging.getLogger(__name__)
 
 
 @book_router.post("/api/book/upload", summary="Загрузить новую книгу", description="",
@@ -38,7 +39,33 @@ async def upload_book(
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка обработки книги: {str(e)}")
+    
+@book_router.patch("/api/book/updateProgress", summary="Обновить прогресс чтения книги", tags=["Загрузка и работа с файлами"])
+async def update_book_progress(
+    bookId: str = Query(..., description="ID книги"),
+    blockStopBook: int = Query(..., description="Номер текущего прочитанного блока"),
+    totalPages: int = Query(..., description="Общее количество страниц текущего текста")
+):
+    try:
+        logger.info(f"Запрос на обновление прогресса: bookId={bookId}, blockStopBook={blockStopBook}, totalPages={totalPages}")
 
+        # Обновляем прогресс через репозиторий
+        update_result = await book_service.book_repository.update_book_progress_by_block(bookId, blockStopBook, totalPages)
+        if not update_result:
+            raise HTTPException(status_code=404, detail="Книга не найдена")
+
+        logger.info(f"Прогресс книги {bookId} успешно обновлён")
+        return JSONResponse(
+            status_code=200,
+            content={"blockStopBook": blockStopBook, "progress": update_result["progress"]},
+        )
+
+    except HTTPException as http_exc:
+        logger.warning(f"HTTP ошибка: {http_exc.detail}")
+        raise http_exc
+    except Exception as e:
+        logger.error(f"Ошибка при обновлении прогресса книги: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка обновления прогресса: {str(e)}")
 
 @book_router.get("/api/book/detail", summary="Получить детали книги", description="",
                  tags=["Загрузка и работа с файлами"])
@@ -82,13 +109,15 @@ async def get_book_detail(
         response = {
             "title": book_doc.get("title", "Без названия"),
             "authors": book_doc.get("author", "Неизвестен"),
-            "annotation": book_doc.get("annotation", ""),
+            "annotation": book_doc.get("annotation", None),
             "progress": book_doc.get("progress", 0),
             "totalPages": len(text_block_ids),
             "textBlocks": original_text_blocks,
-            "compressedText": compressed_text,  # уже подставлены правильные content
+            "blockStopBook": book_doc.get("blockStopBook", 0),  
+            "chapterStopBook": book_doc.get("chapterStopBook", 0), 
             "status": book_doc.get("status", "reading"),
-            "compressionLevel": book_doc.get("compressionLevel", 0)
+            "compressionLevel": book_doc.get("compressionLevel", 0),
+            "compressedText": compressed_text
         }
 
         return JSONResponse(status_code=200, content=response)
@@ -96,55 +125,8 @@ async def get_book_detail(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка получения книги: {str(e)}")
 
-
-
-@book_router.get("/api/book/page", summary="Получить страницу книги", description="",
+@book_router.put("/api/book/updateCompressionLevel", summary="Обновить уровень сжатия книги", description="",
                  tags=["Загрузка и работа с файлами"])
-async def get_book_page(
-    bookId: str = Query(..., description="ID книги"),
-    page: int = Query(1, description="Номер страницы (начиная с 1)")
-):
-    logging.info(f"Получен запрос: bookId={bookId}, page={page}")
-
-    if page < 1:
-        logging.error("Номер страницы меньше 1")
-        raise HTTPException(status_code=400, detail="Номер страницы должен быть больше или равен 1")
-
-    try:
-        # Получаем данные книги по ID
-        book_doc = await book_service.book_repository.get_book_by_id(bookId)
-        if not book_doc:
-            logging.error(f"Книга с ID {bookId} не найдена")
-            raise HTTPException(status_code=404, detail="Книга не найдена")
-
-        # Проверяем наличие текстовых блоков
-        text_block_ids = book_doc.get("textBlockIds", [])
-        logging.info(f"Количество текстовых блоков: {len(text_block_ids)}")
-        if page > len(text_block_ids):
-            logging.error(f"Запрошенная страница {page} превышает количество страниц {len(text_block_ids)}")
-            raise HTTPException(status_code=404, detail="Страница не найдена")
-
-        # Получаем текстовый блок по ID
-        text_block_id = text_block_ids[page - 1]
-        text_block_doc = await book_service.book_repository.get_text_block_by_id(text_block_id)
-        if not text_block_doc:
-            logging.error(f"Текстовый блок с ID {text_block_id} не найден")
-            raise HTTPException(status_code=404, detail="Текстовый блок не найден")
-
-        # Формируем ответ
-        response = BookPageResponse(
-            pageNumber=page,
-            totalPages=len(text_block_ids),
-            content=text_block_doc.get("original", "")
-        )
-        logging.info(f"Успешно возвращена страница {page} для книги {bookId}")
-        return response
-
-    except Exception as e:
-        logging.exception(f"Ошибка получения страницы книги {bookId}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Ошибка получения страницы книги: {str(e)}")
-    
-@book_router.put("/api/book/updateCompressionLevel", summary="Обновить уровень сжатия книги")
 async def update_compression_level(
     bookId: str = Query(..., description="ID книги"),
     request: CompressionUpdateRequest = Body(...)

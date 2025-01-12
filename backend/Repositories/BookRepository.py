@@ -63,6 +63,37 @@ class BookRepository:
         except Exception as e:
             logger.error(f"Ошибка при обновлении поля {field_name} книги с ID {book_id}: {e}")
             raise Exception(f"Ошибка при обновлении поля книги: {e}")
+        
+    async def update_book_progress_by_block(self, book_id: str, block_stop_book: int, total_pages: int) -> dict:
+        try:
+            logger.info(f"Запрос на обновление прогресса: book_id={book_id}, block_stop_book={block_stop_book}, total_pages={total_pages}")
+
+            # Получаем книгу
+            book = await self.get_book_by_id(book_id)
+            if not book:
+                raise Exception(f"Книга с ID {book_id} не найдена")
+
+            # Проверяем корректность total_pages
+            if total_pages <= 0:
+                raise Exception("Некорректное количество страниц для расчёта прогресса")
+
+            # Рассчитываем прогресс
+            progress = int(((block_stop_book + 1) / total_pages) * 100)
+            logger.info(f"Рассчитанный прогресс: {progress}% (block_stop_book={block_stop_book}, total_pages={total_pages})")
+
+            # Обновляем `blockStopBook` и `progress`
+            result = await self.books_collection.update_one(
+                {"_id": ObjectId(book_id)},
+                {"$set": {"blockStopBook": block_stop_book, "progress": progress}}
+            )
+            if result.matched_count == 0:
+                raise Exception(f"Не удалось обновить книгу с ID {book_id}")
+
+            logger.info(f"Прогресс книги {book_id} успешно обновлён: blockStopBook={block_stop_book}, progress={progress}%")
+            return {"blockStopBook": block_stop_book, "progress": progress}
+        except Exception as e:
+            logger.error(f"Ошибка при обновлении прогресса книги {book_id}: {e}")
+            raise Exception(f"Ошибка при обновлении прогресса книги: {e}")
 
 
     async def save_compressed_blocks(self, book_id: str, compression_level: int, compressed_blocks: List[str]) -> List[str]:
@@ -114,9 +145,3 @@ class BookRepository:
             {"_id": {"$in": object_ids}}
         ).to_list(length=len(block_ids))
         return blocks
-
-
-
-
-
-

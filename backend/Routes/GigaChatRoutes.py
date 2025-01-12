@@ -1,8 +1,6 @@
-from typing import List, Literal, Optional
+from typing import Optional
 from fastapi import FastAPI, Query, HTTPException, APIRouter
 from fastapi.responses import JSONResponse
-from datetime import datetime
-import json
 from Services.GigaChatServices import choice_action
 from Repositories.BookRepository import BookRepository  # Репозиторий для работы с книгами
 import logging
