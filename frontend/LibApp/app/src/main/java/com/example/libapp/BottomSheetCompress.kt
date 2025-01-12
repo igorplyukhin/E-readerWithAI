@@ -15,15 +15,11 @@ import com.google.android.material.slider.Slider
 class BottomSheetCompress : BottomSheetDialogFragment() {
 
     private var onApplyClickListener: ((Int) -> Unit)? = null
-    private var onDismissListener: (() -> Unit)? = null // Слушатель на закрытие окна
-    private var currentCompressionLevel: Int = 0 // Текущее значение уровня сжатия
+    private var onDismissListener: (() -> Unit)? = null
+    private var currentCompressionLevel: Int = 0
 
     fun setOnApplyClickListener(listener: (Int) -> Unit) {
         onApplyClickListener = listener
-    }
-
-    fun setOnDismissListener(listener: () -> Unit) {
-        onDismissListener = listener
     }
 
     fun setCurrentCompressionLevel(level: Int) {
@@ -60,7 +56,7 @@ class BottomSheetCompress : BottomSheetDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismissListener?.invoke() // Вызываем слушатель на закрытие
+        onDismissListener?.invoke()
     }
 
     fun updateSliderValue(level: Int) {

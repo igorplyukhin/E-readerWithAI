@@ -2,7 +2,6 @@ package com.example.libapp.api
 
 import com.example.libapp.models.AuthResponse
 import com.example.libapp.models.BookDetailResponse
-import com.example.libapp.models.BookPageResponse
 import com.example.libapp.models.BookResponse
 import com.example.libapp.models.CompressionResponse
 import com.example.libapp.models.UserBooksResponse
@@ -48,25 +47,25 @@ interface ApiService {
         @Query("bookId") bookId: String
     ): Call<BookDetailResponse>
 
-    // Метод для получения содержимого конкретной страницы
-    @GET("api/book/page")
-    fun getBookPage(
-        @Query("bookId") bookId: String,
-        @Query("page") pageNumber: Int
-    ): Call<BookPageResponse>
-
+    // Метод для обновления уровня сжатия книги
     @PUT("api/book/updateCompressionLevel")
     fun updateBookCompressionLevel(
         @Query("bookId") bookId: String,
         @Body compressionLevel: Map<String, Int>
     ): Call<Void>
 
+    // Метод для вызова сжатия текста книги
     @POST("api/gigachat/compress-book")
     fun compressBook(
         @Query("book_id") bookId: String,
         @Query("compression_level") compressionLevel: Int
     ): Call<CompressionResponse>
 
-
+    @PATCH("/api/book/updateProgress")
+    fun updateBookProgress(
+        @Query("bookId") bookId: String,
+        @Query("blockStopBook") blockStopBook: Int,
+        @Query("totalPages") totalPages: Int
+    ): Call<Map<String, Int>>
 
 }

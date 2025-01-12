@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -69,7 +70,19 @@ class BookDetailActivity : AppCompatActivity() {
     // Пуллинг (каждые 2 сек)
     private val handler = Handler(Looper.getMainLooper())
     private var pollingAttempts = 0
-    private val MAX_POLLING_ATTEMPTS = 30
+    private val MAX_POLLING_ATTEMPTS = 600
+
+    // Регистрация нового API для запуска активности
+    private val bookReadingLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Обновляем данные книги после завершения BookReadingActivity
+            bookId?.let {
+                loadBookDetails(it)
+            }
+        }
+    }
 
     // ------------------------------------------------------
 
@@ -119,16 +132,15 @@ class BookDetailActivity : AppCompatActivity() {
             loadBookDetails(bookId!!)
         }
 
-        // Кнопка «Читать»
+        // Кнопка "Читать книгу"
         btnReadBook.setOnClickListener {
-            Log.d("BOOK_DETAIL", "btnReadBook clicked")
             if (bookId != null) {
                 val intent = Intent(this, BookReadingActivity::class.java).apply {
                     putExtra("BOOK_ID", bookId)
                     putExtra("COMPRESSION_LEVEL", compressionLevel)
                     putExtra("COMPRESSED_CONTENT", compressedContent)
                 }
-                startActivity(intent)
+                bookReadingLauncher.launch(intent)
             } else {
                 Toast.makeText(this, "Ошибка: ID книги отсутствует", Toast.LENGTH_SHORT).show()
             }
@@ -154,6 +166,13 @@ class BookDetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Обновляем данные книги при возвращении к активности
+        bookId?.let {
+            loadBookDetails(it)
+        }
+    }
     // ------------------------------------------------------
 
     private fun createNotificationChannelIfNeeded() {
@@ -447,14 +466,14 @@ class BookDetailActivity : AppCompatActivity() {
                     pollingAttempts++
                     handler.postDelayed(
                         { startCheckIfCompressionReadyInDB(neededLevel) },
-                        2000 // задержка в 2 секунды
+                        5000 // задержка в 2 секунды
                     )
                 } else {
                     Log.d("BOOK_DETAIL", "polling -> response not successful or body==null")
                     pollingAttempts++
                     handler.postDelayed(
                         { startCheckIfCompressionReadyInDB(neededLevel) },
-                        2000 // задержка в 2 секунды
+                        5000 // задержка в 2 секунды
                     )
                 }
             }
@@ -464,7 +483,7 @@ class BookDetailActivity : AppCompatActivity() {
                 pollingAttempts++
                 handler.postDelayed(
                     { startCheckIfCompressionReadyInDB(neededLevel) },
-                    2000 // задержка в 2 секунды
+                    5000 // задержка в 2 секунды
                 )
             }
         })

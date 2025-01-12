@@ -25,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
         val btnBack = findViewById<ImageButton>(R.id.btnBack)
 
         btnLogin.setOnClickListener {
-            val login = etLogin.text.toString().trim() // Убираем лишние пробелы
+            val login = etLogin.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
             if (login.isNotEmpty() && password.isNotEmpty()) {
@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnBack.setOnClickListener {
-            finish() // Возврат на предыдущий экран
+            finish()
         }
     }
 

@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.libapp.R
 
-class PageAdapter(private val pages: List<String>) : RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
+class PageAdapter(private var pages: List<String>) : RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
 
     inner class PageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvPageContent: TextView = view.findViewById(R.id.tvPageContent)
@@ -23,4 +23,10 @@ class PageAdapter(private val pages: List<String>) : RecyclerView.Adapter<PageAd
     }
 
     override fun getItemCount(): Int = pages.size
+
+    // Новый метод для обновления данных
+    fun updatePages(newPages: List<String>) {
+        pages = newPages
+        notifyDataSetChanged()
+    }
 }

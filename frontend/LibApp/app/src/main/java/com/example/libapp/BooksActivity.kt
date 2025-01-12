@@ -127,6 +127,12 @@ class BooksActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.menu_books
     }
 
+    override fun onResume() {
+        super.onResume()
+        val userId = intent.getStringExtra("USER_ID") ?: return
+        loadBooks(userId) // Перезагружаем список книг при возврате на экран
+    }
+
     private fun loadBooks(userId: String) {
         showLoading()
         bookViewModel.loadUserBooks(userId)

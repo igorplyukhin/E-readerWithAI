@@ -31,7 +31,7 @@ class BookAdapter(
             progressBar.progress = book.progress ?: 0
 
             itemView.setOnClickListener {
-                onItemClick(book) // Обработка клика
+                onItemClick(book)
             }
         }
     }
