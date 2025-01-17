@@ -7,6 +7,7 @@ from models.Book import Book
 from models.TextBlock import TextBlock
 from Utils.Fb2Processor import Fb2Processor
 from Utils.TextUtils import split_into_blocks
+from Services.GigaChatServices import choice_action
 
 
 class BookProcessor:
@@ -15,12 +16,12 @@ class BookProcessor:
         self.name_file = name_file
 
     def read_text_file(self) -> str:
-        with open(self.file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(self.file_path, "r", encoding="utf-8", errors="ignore") as f:
             return f.read()
 
     def read_pdf_file(self) -> str:
         text_content = []
-        with open(self.file_path, 'rb') as f:
+        with open(self.file_path, "rb") as f:
             reader = PdfReader(f)
             for page in reader.pages:
                 page_text = page.extract_text()
@@ -52,18 +53,18 @@ class BookProcessor:
         if file_type == "text/plain":
             content = self.read_text_file()
             book_text = BookText(
-                title=self.extract_line_content(content, "Title:") or "Название не указано",
-                authors=self.extract_line_content(content, "Author(s):") or "Автор книги не указан",
-                content=self.extract_line_content(content, "Content:") or "Описание отсутствует",
-                annotation=None
+                title=self.extract_line_content(content, "Title:")
+                or "Название не указано",
+                authors=self.extract_line_content(content, "Author(s):")
+                or "Автор книги не указан",
+                content=self.extract_line_content(content, "Content:")
+                or "Описание отсутствует",
+                annotation=None,
             )
         elif file_type == "application/pdf":
             text = self.read_pdf_file()
             book_text = BookText(
-                title="Неизвестно",
-                authors="Неизвестно",
-                content=text,
-                annotation=None
+                title="Неизвестно", authors="Неизвестно", content=text, annotation=None
             )
         elif file_type == "application/fb2+xml":
             book_text = self.read_fb2_file()
@@ -82,13 +83,8 @@ class BookProcessor:
             nameFile=self.name_file,
             filePath=self.file_path,
             compressionLevel=0,
-            compressedText={  
-                "25": [],
-                "50": [],
-                "75": []
-            }
+            compressedText={"25": [], "50": [], "75": []},
         )
-
 
     def extract_line_content(self, content: str, prefix: str) -> Optional[str]:
         pattern = re.compile(prefix + r"\s*(.*)", re.IGNORECASE)
@@ -106,8 +102,43 @@ class BookProcessor:
                 text_block = TextBlock(
                     _id=str(ObjectId()),
                     original=block_content,
-                    numberChapter=chapter_index + 1
+                    numberChapter=chapter_index + 1,
                 )
                 text_blocks.append(text_block)
         return text_blocks
 
+
+async def generate_tests(
+    self, book_id: str, test_type: str, stop_block: int
+) -> List[dict]:
+    book = await self.book_repository.get_book_by_id(book_id)
+
+    # Получаем текстовые блоки только до указанного блока
+    text_blocks = await self.book_repository.get_text_blocks_until(book_id, stop_block)
+
+    # Извлекаем необходимые значения из документа книги
+    file_path = book.get("file_path")
+    name_file = book.get("name_file")
+
+    # Определяем заголовок книги
+    book_title = book.get("title", "Без названия")
+
+    # Выбор промпта в зависимости от типа теста
+    if test_type == "key_points":
+        prompt = f"Сгенерируй 10 вопросов с несколькими вариантами ответа, проверяющих понимание ключевых моментов, обсуждаемых в книге {book_title}."
+    elif test_type == "main_ideas":
+        prompt = f"Сгенерируй 5 вопросов с несколькими вариантами ответа, которые проверяют понимание основных идей и мыслей, выраженных в книге {book_title}."
+    else:
+        raise ValueError("Неверный тип теста")
+
+    tests = await choice_action(
+        text_blocks=text_blocks,
+        action="tests",
+        percent_compress=0,
+        prompt=prompt,
+        temperature=0.87,
+        top_p=0.47,
+        book=book,
+        book_id=book_id,
+    )
+    return tests
