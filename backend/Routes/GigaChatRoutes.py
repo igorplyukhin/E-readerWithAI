@@ -4,9 +4,17 @@ from fastapi.responses import JSONResponse
 from Services.GigaChatServices import choice_action
 from Repositories.BookRepository import BookRepository  # Репозиторий для работы с книгами
 import logging
+import random
+from models.BookDetailResponse import BookDetailResponse
+from Services.UserService import UserService
+from models.TestResponse import TestResponse, Question, Answer, MessageResponse
+from Services.GigaChatServices import generate_questions_from_blocks
+from typing import Union
+
 
 app = FastAPI()
 gigachat_router = APIRouter()
+user_service = UserService() 
 logger = logging.getLogger(__name__)
 
 # Инициализация репозиториев
@@ -129,3 +137,98 @@ async def simple_chat(
     
     result = await choice_action(None, "dialog", None, custom_promt, temperature, top_p, message)
     return {"answer": result}
+
+@gigachat_router.post(
+    "/api/gigachat/generate-test",
+    summary="Генерация теста по прочитанному тексту",
+    response_model=Union[TestResponse, MessageResponse],
+    tags=["Работа с GigaChat"]
+)
+async def generate_test(
+    book_id: str = Query(..., description="ID книги"),  # Убираем user_id
+):
+    try:
+        logging.info(f"Начата генерация теста для книги: {book_id}")
+
+        # 1) Получение данных о книге
+        logging.info("Получение данных о книге...")
+        book = await book_repository.get_book_by_id(book_id)  # Получаем книгу по book_id
+        if not book:
+            logging.warning(f"Книга с ID {book_id} не найдена.")
+            raise HTTPException(status_code=404, detail="Книга не найдена.")
+        logging.info(f"Книга {book_id} найдена.")
+
+        # 2) Проверка прогресса чтения книги
+        if book.get('progress', 0) < 1:
+            logging.info(f"Книга {book_id} не начата.")
+            return MessageResponse(
+                message="Вы ещё не начали читать книгу, поэтому тест нельзя составить."
+            )
+        logging.info(f"Книга {book_id} найдена. Прогресс: {book['progress']}%.")
+
+        # 3) Получение текстовых блоков
+        logging.info("Получение текстовых блоков до текущей страницы...")
+        text_blocks = await book_repository.get_text_blocks_by_ids(
+            book['textBlockIds'][:book.get('blockStopBook', 0) + 1]
+        )
+        if not text_blocks:
+            logging.error(f"Не удалось получить текстовые блоки для книги {book_id}.")
+            raise HTTPException(
+                status_code=500,
+                detail="Не удалось получить текстовые блоки для прочитанных страниц."
+            )
+        logging.info(f"Получено {len(text_blocks)} текстовых блоков для книги {book_id}.")
+
+        # 4) Генерация вопросов
+        logging.info("Генерация вопросов из текстовых блоков...")
+        raw_questions = await generate_questions_from_blocks(
+            text_blocks=text_blocks,
+            temperature=0.7,
+            top_p=0.9,
+        )
+        if not raw_questions:
+            logging.error("Не удалось сгенерировать вопросы.")
+            raise HTTPException(status_code=500, detail="Не удалось сгенерировать вопросы.")
+        logging.info(f"Сгенерировано {len(raw_questions)} вопросов.")
+
+        # 5) Форматирование вопросов для фронтенда
+        logging.info("Форматирование вопросов для фронтенда...")
+        questions = []
+        for question_data in raw_questions:
+            try:
+                question_text = question_data.get("question")
+                answers_data = question_data.get("answers", [])
+
+                answers = [
+                    Answer(text=ans["text"], is_correct=ans["is_correct"])
+                    for ans in answers_data
+                ]
+                questions.append(Question(question=question_text, answers=answers))
+
+            except Exception as e:
+                logging.error(f"Ошибка при обработке вопроса: {e}")
+                continue
+
+        if not questions:
+            logging.error("Нет корректно сформированных вопросов.")
+            raise HTTPException(status_code=500, detail="Не удалось сформировать вопросы.")
+
+        # Ограничим список 5 вопросами случайным образом
+        if len(questions) > 5:
+            logging.info(f"Выбираем случайные 5 вопросов из {len(questions)} доступных.")
+            questions = random.sample(questions, 5)
+
+        logging.info("Формирование результата для фронтенда.")
+        return TestResponse(questions=questions)
+
+    except HTTPException as e:
+        logging.warning(f"HTTP ошибка: {e.detail}")
+        raise e
+    except Exception as e:
+        logging.error(f"Неизвестная ошибка при генерации теста: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка при генерации теста.")
+
+
+
+
+

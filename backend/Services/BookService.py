@@ -3,8 +3,6 @@ from fastapi.encoders import jsonable_encoder
 from Repositories.BookRepository import BookRepository
 from Utils.BookProcessor import BookProcessor
 from Utils.Fb2Processor import Fb2Processor
-from typing import List
-
 
 class BookService:
     def __init__(self):
@@ -43,37 +41,25 @@ class BookService:
             chapters = book_processor.get_chapters(file_type)
             text_blocks = book_processor.process_chapters_and_blocks(chapters)
         except Exception as e:
-            raise HTTPException(
-                status_code=500, detail="Error generating book structure"
-            )
+            raise HTTPException(status_code=500, detail="Error generating book structure")
 
         try:
             book_dict = jsonable_encoder(book)
             book_id = await self.book_repository.insert_book(book_dict)
-            book_dict["_id"] = str(book_id)
+            book_dict["_id"] = str(book_id)  
         except Exception as e:
-            raise HTTPException(
-                status_code=500, detail="Error inserting book into database"
-            )
+            raise HTTPException(status_code=500, detail="Error inserting book into database")
 
         try:
             text_block_documents = jsonable_encoder(text_blocks)
-            text_block_ids = await self.book_repository.insert_text_blocks(
-                text_block_documents
-            )
+            text_block_ids = await self.book_repository.insert_text_blocks(text_block_documents)
         except Exception as e:
-            raise HTTPException(
-                status_code=500, detail="Error inserting text blocks into database"
-            )
+            raise HTTPException(status_code=500, detail="Error inserting text blocks into database")
 
         try:
-            await self.book_repository.update_book_text_block_ids(
-                book_id, text_block_ids
-            )
+            await self.book_repository.update_book_text_block_ids(book_id, text_block_ids)
         except Exception as e:
-            raise HTTPException(
-                status_code=500, detail="Error updating book with text block IDs"
-            )
+            raise HTTPException(status_code=500, detail="Error updating book with text block IDs")
 
         try:
             await self.book_repository.update_user_books(user_id, book_id)
@@ -82,28 +68,10 @@ class BookService:
 
         return book_dict
 
-    async def generate_tests(
-        self, book_id: str, test_type: str, stop_block: int
-    ) -> List[dict]:
-        # Получаем информацию о книге, включая file_path и name_file
-        book = await self.book_repository.get_book_by_id(book_id)
-
-        # Извлекаем необходимые значения из документа книги
-        file_path = book.get("filePath")
-        name_file = book.get("nameFile")
-
-        # Создаем экземпляр BookProcessor с необходимыми параметрами
-        book_processor = BookProcessor(file_path, name_file)
-
-        # Генерируем тесты
-        tests = await book_processor.generate_tests(book_id, test_type, stop_block)
-
-        return tests
-
     def get_supported_file_type(self, file_name: str) -> str:
-        extension = file_name.split(".")[-1].lower()
+        extension = file_name.split('.')[-1].lower()
         return {
             "pdf": "application/pdf",
             "fb2": "application/fb2+xml",
-            "txt": "text/plain",
+            "txt": "text/plain"
         }.get(extension)

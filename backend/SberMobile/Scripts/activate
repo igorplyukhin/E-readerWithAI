@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\ivan\Desktop\UrfuMobil\back\E-readerWithAI\backend\SberMobile"
+VIRTUAL_ENV="C:\Users\ivan\Desktop\UrfuMobil\back2.0\E-readerWithAI\backend\SberMobile"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

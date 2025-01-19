@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import List, Dict, Literal, Optional
 import requests
 import uuid
 from Utils.ReadSettings import get_setting
@@ -7,12 +7,13 @@ import logging
 import urllib3
 from Repositories.BookRepository import BookRepository
 from fastapi import HTTPException
+import json
+import re
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Инициализация репозитория
 book_repository = BookRepository()
-
 
 # Константы для авторизации и адресов
 TOKEN_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
@@ -22,6 +23,7 @@ MAX_GIGACHAT_TOKENS = 4096  # Максимальная длина ответа �
 
 # Глобальная переменная для токена авторизации
 auth_token = None
+
 
 async def choice_action(
     text_blocks: List[dict],
@@ -141,8 +143,12 @@ def get_token(scope="GIGACHAT_API_CORP"):
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при запросе токена доступа: {e}")
 
+
 # Функция для отправки сообщения в GigaChat
-def send_to_gigachat(prompt, message, temperature=0.87, top_p=0.47) -> str:
+def send_to_gigachat(prompt, message, temperature=0.87, top_p=0.47) -> Optional[str]:
+    """
+    Возвращает СТРОКУ (content ответа). Если GigaChat ничего не вернул, вернёт None.
+    """
     if not auth_token:
         logging.error("Ошибка: Токен не получен. Пожалуйста, проверьте авторизацию.")
         return None
@@ -177,6 +183,7 @@ def send_to_gigachat(prompt, message, temperature=0.87, top_p=0.47) -> str:
             logging.info(f"Ответ GigaChat: {json_response}")
             choices = json_response.get("choices")
             if choices:
+                # Возвращаем только текст из ответа GigaChat
                 return choices[0].get("message", {}).get("content")
             else:
                 logging.error("Не удалось получить содержимое ответа GigaChat.")
@@ -244,4 +251,210 @@ def compress_block_with_retry(block, compression_rate, max_attempts, prompt, tem
         return None
 
 
+def parse_gigachat_response(raw_content: str) -> List[Dict]:
+    """
+    Парсер GigaChat-ответа в формате:
+    
+    1. Как зовут героя?
+    a) ...
+    b) ...
+    c) ...
+    d) ...
 
+    Правильный ответ: c) ...
+    
+    и т.д.
+
+    - question_re ловит '1.' или '1)' и забирает остальное как текст вопроса
+    - answer_re ловит варианты 'a)', 'Б)' (и др.)
+    - correct_re ловит 'Правильный ответ: ...'
+    """
+
+    # Разбиваем на строки, убираем пустые
+    lines = [ln.strip() for ln in raw_content.splitlines() if ln.strip()]
+
+    # Регулярка для вопроса: "1.", "1)" и т.п.
+    question_re = re.compile(r"^(\d+)[\.\)]\s*(.*)")
+
+    # Регулярка для варианта ответа (a-d латиница, а-г кириллица, верхн./нижн.):
+    answer_re = re.compile(r"^([a-dA-DA-D]|[а-гА-Г])\)\s*(.*)")
+
+    # Регулярка для строки "Правильный ответ: ...":
+    correct_re = re.compile(r"правильный\s+ответ:\s*(.*)", re.IGNORECASE)
+
+    questions: List[Dict] = []
+    current_question = None
+
+    for idx, line in enumerate(lines):
+        logging.debug(f"Line #{idx}: {repr(line)}")
+
+        # 1) Проверяем, не похоже ли это на "1. Что-то"
+        qmatch = question_re.match(line)
+        if qmatch:
+            # Если уже был вопрос, добавляем его в список
+            if current_question:
+                questions.append(current_question)
+
+            question_text = qmatch.group(2)
+            current_question = {
+                "question": question_text,
+                "answers": []
+            }
+            logging.debug(f" -> New question detected: {question_text}")
+            continue
+
+        # 2) Если у нас уже есть текущий вопрос, ищем варианты или правильный ответ
+        if current_question:
+            # a) / b) / ...
+            amatch = answer_re.match(line)
+            if amatch:
+                letter = amatch.group(1)   # напр. "a" или "Б"
+                ans_text = amatch.group(2)
+
+                current_question["answers"].append({
+                    "text": f"{letter}) {ans_text}",
+                    "is_correct": False
+                })
+                logging.debug(f" -> New answer added: {letter}) {ans_text}")
+                continue
+
+            # Правильный ответ
+            cmatch = correct_re.match(line)
+            if cmatch:
+                correct_str = cmatch.group(1).strip()
+                logging.debug(f" -> Found correct answer line: '{correct_str}'")
+
+                found = False
+                for ans in current_question["answers"]:
+                    # Если подстрока correct_str встречается в тексте варианта
+                    if correct_str in ans["text"]:
+                        ans["is_correct"] = True
+                        found = True
+                        logging.debug(f"    Marked is_correct=True for: {ans['text']}")
+                if not found:
+                    logging.debug("    (But no matching answer found!)")
+
+                continue
+
+        else:
+            # Если строка не подходит и current_question ещё не открыт, пропускаем
+            logging.debug(" -> No current_question in progress, skipping line.")
+            continue
+
+    # 3) Добавляем последний вопрос, если есть
+    if current_question:
+        questions.append(current_question)
+
+    # ---- ПОСЛЕ парсинга — снимаем экранирование \" (если оно есть) ----
+    def unescape_quotes(text: str) -> str:
+        # Просто заменяет \\" на "
+        return text.replace('\\"', '"')
+
+    for q in questions:
+        # Чистим вопрос
+        q["question"] = unescape_quotes(q["question"])
+        # Чистим текст у каждого ответа
+        for ans in q["answers"]:
+            ans["text"] = unescape_quotes(ans["text"])
+
+    # Очистка текста от символов "a)", "б)" и т.п.
+    def remove_answer_prefix(text: str) -> str:
+        """
+        Убирает префиксы вроде 'a)', 'б)' и т.п. из текста ответа.
+        """
+        return re.sub(r"^[a-dA-DA-Dа-гА-Г]\)\s*", "", text)
+
+    for q in questions:
+        # Очищаем вопрос
+        q["question"] = remove_answer_prefix(q["question"])
+        # Очищаем каждый ответ
+        for ans in q["answers"]:
+            ans["text"] = remove_answer_prefix(ans["text"])
+
+    return questions
+
+
+async def generate_questions_from_blocks(
+    text_blocks: List[Dict],
+    prompt: Optional[str] = None,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+) -> List[Dict]:
+    """
+    Генерация вопросов по текстовым блокам.
+    1) Склеиваем все блоки в строку.
+    2) Режем по 5000 символов, если слишком длинно.
+    3) Для каждого куска отправляем запрос в GigaChat, получаем строку с вопросами.
+    4) Парсим эту строку функцией parse_gigachat_response.
+    """
+    try:
+        logging.info("Начинается генерация вопросов по текстовым блокам...")
+
+        # Получаем токен
+        get_token()
+        if not auth_token:
+            logging.error("Ошибка: Не удалось получить токен авторизации.")
+            raise HTTPException(status_code=401, detail="Не удалось получить токен.")
+
+        # Извлечение текста из блоков
+        combined_text = "".join(
+            block.get("original", block.get("content", ""))\
+                 .replace("\n", " ")\
+                 .strip()
+            for block in text_blocks
+        )
+
+        if not combined_text:
+            logging.error("Текстовые блоки пустые или не содержат данных.")
+            raise HTTPException(status_code=500, detail="Текстовые блоки пустые или не содержат данных.")
+
+        logging.info(f"Текст успешно объединен. Длина текста: {len(combined_text)} символов.")
+
+        # Разбиваем текст на блоки по 5000 символов
+        text_chunks = [combined_text[i:i + 5000] for i in range(0, len(combined_text), 5000)]
+        logging.info(f"Текст разбит на {len(text_chunks)} блоков по 5000 символов.")
+
+        # Генерация вопросов для каждого блока
+        questions = []
+        for i, chunk in enumerate(text_chunks):
+            logging.info(f"Генерация вопросов для блока {i + 1}/{len(text_chunks)} длиной {len(chunk)} символов...")
+
+            # Используем пользовательский или дефолтный prompt
+            local_prompt = prompt or (
+                "Составь 5 вопросов на русском языке по тексту, которые проверят понимание читателя. "
+                "Напиши 4 варианта ответа на каждый вопрос, укажи правильный ответ."
+            )
+
+            # Отправляем текстовый блок в GigaChat (вернёт строку)
+            raw_response = send_to_gigachat(
+                prompt=local_prompt,
+                message=chunk,
+                temperature=temperature,
+                top_p=top_p,
+            )
+
+            # Проверяем корректность ответа
+            if not raw_response:
+                logging.warning(f"Не удалось получить вопросы для блока {i + 1}. Пропускаем блок.")
+                continue
+
+            try:
+                # raw_response — это уже строка с вопросами
+                raw_content = raw_response
+                # Парсим текстовый ответ
+                questions_data = parse_gigachat_response(raw_content)
+                questions.extend(questions_data)
+                logging.info(f"Вопросы для блока {i + 1} успешно сгенерированы.")
+            except Exception as parse_error:
+                logging.error(f"Ошибка при обработке вопросов из блока {i + 1}: {parse_error}")
+
+        if not questions:
+            logging.error("Не удалось сгенерировать вопросы для всех блоков.")
+            raise HTTPException(status_code=500, detail="Не удалось сгенерировать вопросы.")
+
+        logging.info(f"Успешно сгенерировано {len(questions)} вопросов.")
+        return questions
+
+    except Exception as e:
+        logging.error(f"Ошибка при генерации вопросов: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка при генерации вопросов.")

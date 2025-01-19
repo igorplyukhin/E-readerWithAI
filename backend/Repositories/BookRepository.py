@@ -47,12 +47,7 @@ class BookRepository:
     async def get_text_block_by_id(self, text_block_id):
         object_id = ObjectId(text_block_id)
         return await self.text_blocks_collection.find_one({"_id": object_id})
-    
-    async def get_compressed_blocks(self, block_ids: List[str]) -> List[dict]:
-        object_ids = [ObjectId(block_id) for block_id in block_ids]
-        return await self.db["compressed_text_blocks"].find({"_id": {"$in": object_ids}}).to_list(length=None)
 
-    
     async def update_book_field(self, book_id: str, field_name: str, value) -> UpdateResult:
         try:
             result = await self.books_collection.update_one(
