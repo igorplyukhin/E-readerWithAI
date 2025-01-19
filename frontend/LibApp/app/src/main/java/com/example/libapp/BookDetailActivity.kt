@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class BookDetailActivity : AppCompatActivity() {
     private lateinit var btnReadBook: Button
     private lateinit var btnCompressText: Button
     private lateinit var btnBack: ImageButton
+    private lateinit var btnTakeTest: Button
 
     // Идентификаторы
     private var bookId: String? = null
@@ -67,7 +69,7 @@ class BookDetailActivity : AppCompatActivity() {
     private val NOTIF_ID_ONGOING = 1001  // «идёт сжатие»
     private val NOTIF_ID_DONE = 1002     // «сжатие завершено»
 
-    // Пуллинг (каждые 2 сек)
+    // Пуллинг (каждые 6 сек)
     private val handler = Handler(Looper.getMainLooper())
     private var pollingAttempts = 0
     private val MAX_POLLING_ATTEMPTS = 600
@@ -114,6 +116,7 @@ class BookDetailActivity : AppCompatActivity() {
         btnReadBook = findViewById(R.id.btnReadBook)
         btnCompressText = findViewById(R.id.btnCompressText)
         btnBack = findViewById(R.id.btnBack)
+        btnTakeTest = findViewById(R.id.btnTakeTest)
 
         btnBack.setOnClickListener {
             Log.d("BOOK_DETAIL", "btnBack clicked -> finish()")
@@ -164,7 +167,23 @@ class BookDetailActivity : AppCompatActivity() {
             bottomSheet?.setCurrentCompressionLevel(localCompressionLevel)
             bottomSheet?.show(supportFragmentManager, "BottomSheetCompress")
         }
+
+        btnTakeTest.setOnClickListener {
+            if (bookId != null) {
+                // Показываем диалог с прогресс-баром сразу
+                val bottomSheetTest = BottomSheetTest.newInstance(bookId!!)
+
+                // Передаем слушатель для обновления прогресс-бара
+                bottomSheetTest.setOnStartLoadingListener {
+                    progressBar.visibility = View.VISIBLE
+                }
+
+                // Показываем диалог
+                bottomSheetTest.show(supportFragmentManager, "BottomSheetTest")
+            }
+        }
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -260,7 +279,6 @@ class BookDetailActivity : AppCompatActivity() {
             override fun onFailure(call: Call<BookDetailResponse>, t: Throwable) {
                 Log.d("BOOK_DETAIL", "loadBookDetails onFailure: ${t.message}")
                 setEnabledState(true)
-                Toast.makeText(this@BookDetailActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -409,11 +427,6 @@ class BookDetailActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<CompressionResponse>, t: Throwable) {
                     Log.d("BOOK_DETAIL", "compressBook onFailure: ${t.message}")
-                    Toast.makeText(
-                        this@BookDetailActivity,
-                        "Ошибка сети compressBook: ${t.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     // Даже при тайм-ауте или ошибке — запускаем пуллинг
                     pollingAttempts = 0
                     startCheckIfCompressionReadyInDB(level)

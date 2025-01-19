@@ -4,6 +4,7 @@ import com.example.libapp.models.AuthResponse
 import com.example.libapp.models.BookDetailResponse
 import com.example.libapp.models.BookResponse
 import com.example.libapp.models.CompressionResponse
+import com.example.libapp.models.TestResponse
 import com.example.libapp.models.UserBooksResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
@@ -68,4 +69,9 @@ interface ApiService {
         @Query("totalPages") totalPages: Int
     ): Call<Map<String, Int>>
 
+    //Mетод для получения теста по вопросам
+    @POST("/api/gigachat/generate-test")
+    fun generateTest(
+        @Query("book_id") bookId: String
+    ): Call<TestResponse>
 }

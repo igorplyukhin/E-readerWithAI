@@ -1,0 +1,92 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <!-- Верхняя панель -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/bottom_sheet_background">
+
+        <!-- Кнопка назад -->
+        <ImageButton
+                android:id="@+id/btnCloseTest"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/book_arrow_back"
+                android:contentDescription="Закрыть"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Текст "Тест" слева -->
+        <TextView
+                android:id="@+id/tvTitleTest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Тест"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/btnCloseTest"
+                app:layout_constraintTop_toTopOf="@+id/btnCloseTest"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Номер текущего вопроса справа -->
+        <TextView
+                android:id="@+id/tvQuestionCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#AAAAAA"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/btnCloseTest"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnCloseTest"
+                android:layout_marginEnd="8dp" />
+
+        <!-- Прогресс-бар для загрузки -->
+        <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/viewPagerQuestions"
+                app:layout_constraintEnd_toEndOf="@+id/viewPagerQuestions"
+                app:layout_constraintTop_toTopOf="@+id/viewPagerQuestions"
+                app:layout_constraintBottom_toBottomOf="@+id/viewPagerQuestions" />
+
+        <!-- Сообщение о том, что загрузка может занять некоторое время -->
+        <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Это может занять некоторое время..."
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/progressBar"
+                app:layout_constraintEnd_toEndOf="@+id/progressBar"
+                app:layout_constraintTop_toBottomOf="@+id/progressBar"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
+
+        <!-- ViewPager2 для свайпа вопросов -->
+        <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerQuestions"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintTop_toBottomOf="@id/btnCloseTest"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

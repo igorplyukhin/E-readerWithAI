@@ -68,7 +68,6 @@
             android:id="@+id/tvBookTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:text=""
@@ -216,6 +215,21 @@
             android:background="#CCCCCC"
             app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTakeTest"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginTop="16dp"
+            android:text="Тест"
+            android:textSize="13sp"
+            android:textAllCaps="false"
+            android:textColor="#000000"
+            android:backgroundTint="#CACBCE"
+            style="@style/CustomButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvAboutAuthor"
             app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- BottomNavigationView для нижней навигации -->
