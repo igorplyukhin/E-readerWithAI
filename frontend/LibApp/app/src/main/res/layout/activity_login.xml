@@ -70,7 +70,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="Назад"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="50dp" />
 
     <TextView
             android:text="Авторизация"

@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="Назад"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="50dp" />
 
     <!-- Обложка книги -->
     <ImageView
@@ -42,7 +42,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="50dp" />
 
     <!-- Прогресс-бар -->
     <ProgressBar

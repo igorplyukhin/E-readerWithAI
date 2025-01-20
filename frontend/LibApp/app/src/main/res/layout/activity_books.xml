@@ -19,7 +19,8 @@
             app:layout_constraintEnd_toStartOf="@id/btnMore"
             android:paddingStart="16dp"
             android:paddingTop="6dp"
-            android:paddingBottom="8dp" />
+            android:paddingBottom="8dp"
+            android:layout_marginTop="50dp" />
 
     <!-- Кнопка "..." -->
     <ImageButton
